@@ -1,0 +1,51 @@
+services:
+#  node_discord_bot_eso_status:
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '0.5'
+#          memory: 1G
+#    env_file: .env.production
+#    container_name: node_discord_bot_eso_status
+#    image: dov118/eso_status_api:1.0.0-dev.8
+##    build:
+##      context: .
+##      dockerfile: Dockerfile
+#    depends_on:
+#      mysql_discord_bot_eso_status:
+#        condition: service_healthy
+#    ports:
+#      - "443:443"
+  mysql_discord_bot_eso_status:
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1024M
+    env_file: .env
+    image: mysql:8.0.36
+    platform: linux/x86_64
+    container_name: mysql_discord_bot_eso_status
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_USER: $DB_USER
+      MYSQL_PASSWORD: $DB_PASSWORD
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost", "-uroot", "-proot" ]
+      interval: 20s
+      timeout: 1s
+      retries: 30
+  pma_discord_bot_eso_status:
+    container_name: pma_discord_bot_eso_status
+    image: phpmyadmin:5.2.1
+    env_file: .env
+    depends_on:
+     mysql_discord_bot_eso_status:
+      condition: service_healthy
+    environment:
+      PMA_HOST: $DB_HOST
+    ports:
+      - "80:80"

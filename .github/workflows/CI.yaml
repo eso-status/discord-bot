@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "*"
+      - "feature/*"
+      - "hotfix/*"
+      - "bugfix/*"
+      - "release/*"
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4.1.7
+
+      - name: Install npm
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: 20.16.0
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Create env file
+        run: |
+          cat .env.example > .env
+          sed -i -e "s/__NODE_ENV__/testing/g" ./.env
+          sed -i -e "s/__APP_NAME__/eso-status-discord-bot/g" ./.env
+          sed -i -e "s/__DB_TYPE__/sqlite/g" ./.env
+          sed -i -e "s/__DB_HOST__//g" ./.env
+          sed -i -e "s/__DB_PORT__//g" ./.env
+          sed -i -e "s/__DB_NAME__/src/database/dev/g" ./.env
+          sed -i -e "s/__DB_USER__//g" ./.env
+          sed -i -e "s/__DB_PASSWORD__//g" ./.env
+          sed -i -e "s/__DB_DEBUG__//g" ./.env
+          sed -i -e "s/__DISCORD_TOKEN__/${{ secrets.DISCORD_TOKEN }}/g" ./.env
+          sed -i -e "s/__AWS_ACCESS_KEY_ID__//g" ./.env
+          sed -i -e "s/__AWS_SECRET_ACCESS_KEY__//g" ./.env
+          sed -i -e "s/__AWS_REGION__//g" ./.env
+          sed -i -e "s/__CLOUDWATCH_GROUP_NAME__//g" ./.env
+          sed -i -e "s/__CLOUDWATCH_STREAM_NAME__//g" ./.env
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run database migration
+        run: npm run migration:run
+
+      - name: Run test
+        run: npm run test:cov
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2.3.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

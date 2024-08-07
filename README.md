@@ -1,0 +1,11 @@
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=eso-status_discord_bot&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=eso-status_discord_bot)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=eso-status_discord_bot&metric=bugs)](https://sonarcloud.io/summary/new_code?id=eso-status_discord_bot)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=eso-status_discord_bot&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=eso-status_discord_bot)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=eso-status_discord_bot&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=eso-status_discord_bot)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=eso-status_discord_bot&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=eso-status_discord_bot)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=eso-status_discord_bot&metric=coverage)](https://sonarcloud.io/summary/new_code?id=eso-status_discord_bot)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=eso-status_discord_bot&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=eso-status_discord_bot)
+
+[![Build Status](https://github.com/eso-status/discord-bot/workflows/CI/badge.svg)](https://github.com/eso-status/discord-bot/actions/workflows/CI.yaml)
+[![Build Status](https://github.com/eso-status/discord-bot/workflows/CD/badge.svg)](https://github.com/eso-status/discord-bot/actions/workflows/CD.yaml)
+[![Build Status](https://github.com/eso-status/discord-bot/workflows/RELEASE/badge.svg)](https://github.com/eso-status/discord-bot/actions/workflows/RELEASE.yaml)

@@ -1,0 +1,78 @@
+name: RELEASE
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - "main"
+
+jobs:
+  release:
+    name: RELEASE
+    runs-on: ubuntu-latest
+    if: contains(github.head_ref, 'release/')
+    timeout-minutes: 30
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4.1.7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4.0.3
+        with:
+          node-version: 20.16.0
+
+      - name: Get version
+        id: get_version
+        run: |
+          VERSION=`node -p "require('./package.json').version"`
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check if tag exist
+        id: tag_exist
+        run: |
+          exist=`git tag -l ${{ steps.get_version.outputs.version }} | wc -l`
+          echo "exist=$exist" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS credentials
+        if: steps.tag_exist.outputs.exist == 0
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        if: steps.tag_exist.outputs.exist == 0
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2.0.1
+
+      - name: Get Amazon ECS task definition
+        if: steps.tag_exist.outputs.exist == 0
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }} --query taskDefinition > task-definition.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        if: steps.tag_exist.outputs.exist == 0
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1.4.0
+        with:
+          task-definition: "task-definition.json"
+          container-name: ${{ secrets.DOCKER_HUB_REGISTRY }}
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.DOCKER_HUB_NAME }}/${{ secrets.DOCKER_HUB_REGISTRY }}:${{ steps.get_version.outputs.version }}
+
+      - name: Deploy Amazon ECS task definition
+        if: steps.tag_exist.outputs.exist == 0
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1.6.0
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ secrets.ECS_SERVICE }}
+          cluster: ${{ secrets.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+      - name: Create release
+        if: steps.tag_exist.outputs.exist == 0
+        env:
+          GH_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
+        run: |
+          gh release create ${{ steps.get_version.outputs.version }} --title "${{ steps.get_version.outputs.version }}" --generate-notes --latest
