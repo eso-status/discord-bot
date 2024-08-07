@@ -41,12 +41,6 @@ jobs:
           sed -i -e "s/__DISCORD_TOKEN__/${{ secrets.DISCORD_TOKEN }}/g" ./.env
           sed -i -e "s/__DISCORD_TESTING_GUILDID__/${{ secrets.DISCORD_TESTING_GUILDID }}/g" ./.env
           sed -i -e "s/__DISCORD_TESTING_CHANNELID__/${{ secrets.DISCORD_TESTING_CHANNELID }}/g" ./.env
-          sed -i -e "s/__AWS_ACCESS_KEY_ID__//g" ./.env
-          sed -i -e "s/__AWS_SECRET_ACCESS_KEY__//g" ./.env
-          sed -i -e "s/__AWS_REGION__//g" ./.env
-          sed -i -e "s/__CLOUDWATCH_GROUP_NAME__//g" ./.env
-          sed -i -e "s/__CLOUDWATCH_STREAM_NAME__//g" ./.env
-
       - name: Build assets
         run: npm run build
 

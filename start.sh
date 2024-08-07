@@ -14,11 +14,6 @@ sed -i -e "s/__DB_DEBUG__/$DB_DEBUG/g" ./.env
 sed -i -e "s/__DISCORD_TOKEN__/$DISCORD_TOKEN/g" ./.env
 sed -i -e "s/__DISCORD_TESTING_GUILDID__/$DISCORD_TESTING_GUILDID/g" ./.env
 sed -i -e "s/__DISCORD_TESTING_CHANNELID__/$DISCORD_TESTING_CHANNELID/g" ./.env
-sed -i -e "s/__AWS_ACCESS_KEY_ID__/$AWS_ACCESS_KEY_ID/g" ./.env
-sed -i -e "s/__AWS_SECRET_ACCESS_KEY__/$AWS_SECRET_ACCESS_KEY/g" ./.env
-sed -i -e "s/__AWS_REGION__/$AWS_REGION/g" ./.env
-sed -i -e "s/__CLOUDWATCH_GROUP_NAME__/$CLOUDWATCH_GROUP_NAME/g" ./.env
-sed -i -e "s/__CLOUDWATCH_STREAM_NAME__/$CLOUDWATCH_STREAM_NAME/g" ./.env
 
 ## RUN DATABASE MIGRATION
 npm run migration:run
