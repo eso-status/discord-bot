@@ -10,4 +10,4 @@
 [![Build Status](https://github.com/eso-status/discord-bot/workflows/CD/badge.svg)](https://github.com/eso-status/discord-bot/actions/workflows/CD.yaml)
 [![Build Status](https://github.com/eso-status/discord-bot/workflows/RELEASE/badge.svg)](https://github.com/eso-status/discord-bot/actions/workflows/RELEASE.yaml)
 
-[Install Link](https://discord.com/oauth2/authorize?client_id=1270290512770891858&scope=bot%20applications.commands)
+[Install Link](https://discord.com/oauth2/authorize?client_id=1270807135965675571&scope=bot%20applications.commands)

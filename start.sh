@@ -12,6 +12,8 @@ sed -i -e "s/__DB_USER__/$DB_USER/g" ./.env
 sed -i -e "s/__DB_PASSWORD__/$DB_PASSWORD/g" ./.env
 sed -i -e "s/__DB_DEBUG__/$DB_DEBUG/g" ./.env
 sed -i -e "s/__DISCORD_TOKEN__/$DISCORD_TOKEN/g" ./.env
+sed -i -e "s/__DISCORD_TESTING_GUILDID__/$DISCORD_TESTING_GUILDID/g" ./.env
+sed -i -e "s/__DISCORD_TESTING_CHANNELID__/$DISCORD_TESTING_CHANNELID/g" ./.env
 sed -i -e "s/__AWS_ACCESS_KEY_ID__/$AWS_ACCESS_KEY_ID/g" ./.env
 sed -i -e "s/__AWS_SECRET_ACCESS_KEY__/$AWS_SECRET_ACCESS_KEY/g" ./.env
 sed -i -e "s/__AWS_REGION__/$AWS_REGION/g" ./.env

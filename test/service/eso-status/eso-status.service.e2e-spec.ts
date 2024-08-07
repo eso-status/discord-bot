@@ -94,13 +94,13 @@ describe('EsoStatusService (e2e)', (): void => {
 
     const server: Server = await serverRepository.save(
       serverRepository.create({
-        serverId: '382941103063564288',
+        serverId: process.env.DISCORD_TESTING_GUILDID,
       }),
     );
 
     const channel: Channel = await channelRepository.save(
       channelRepository.create({
-        channelId: '609315815770161162',
+        channelId: process.env.DISCORD_TESTING_CHANNELID,
         serverId: server.id,
       }),
     );
