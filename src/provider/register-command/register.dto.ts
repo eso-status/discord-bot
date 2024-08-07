@@ -2,11 +2,9 @@ import { Choice, Param, ParamType } from '@discord-nestjs/core';
 
 export enum Event {
   maintenancePlanned = 'maintenancePlanned',
-  maintenanceRemoved = 'maintenanceRemoved',
   statusUpdate = 'statusUpdate',
   disconnect = 'disconnect',
   reconnect = 'reconnect',
-  connected = 'connected',
 }
 
 export enum Slug {

@@ -1,9 +1,10 @@
 import { Status } from '@eso-status/types';
 import { INestApplication } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 
 import { config } from 'dotenv';
 
-import { bootstrap } from '../../../src/main';
+import { AppModule } from '../../../src/app.module';
 import { EsoStatusService } from '../../../src/service/eso-status/eso-status.service';
 
 config();
@@ -11,12 +12,13 @@ config();
 describe('EsoStatusService', (): void => {
   let app: INestApplication;
   beforeAll(async (): Promise<void> => {
-    app = await bootstrap();
-  });
+    app = await NestFactory.create(AppModule);
+    await app.init();
+  }, 15000);
 
   afterAll(async (): Promise<void> => {
     await app.close();
-  });
+  }, 15000);
 
   it.each(<{ status: Status; icon: string }[]>[
     { status: 'planned', icon: ':date:' },

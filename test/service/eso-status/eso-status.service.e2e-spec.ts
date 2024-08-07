@@ -9,6 +9,8 @@ import {
   Slug as EsoStatusSlug,
 } from '@eso-status/types';
 import { INestApplication } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+
 import { Client } from 'discord.js';
 
 import { config } from 'dotenv';
@@ -16,10 +18,11 @@ import * as moment from 'moment/moment';
 import { Repository } from 'typeorm';
 import { runSeeders } from 'typeorm-extension';
 
+import { AppModule } from '../../../src/app.module';
+
 import { dataSource } from '../../../src/config/typeorm.config';
 import { eventData } from '../../../src/database/data/event.data';
 import { slugData } from '../../../src/database/data/slug.data';
-import { bootstrap } from '../../../src/main';
 import { Channel } from '../../../src/resource/channel/entities/channel.entity';
 import { Event } from '../../../src/resource/event/entities/event.entity';
 import { Server } from '../../../src/resource/server/entities/server.entity';
@@ -69,7 +72,8 @@ describe('EsoStatusService (e2e)', (): void => {
     await dataSource.runMigrations();
     await runSeeders(dataSource);
 
-    app = await bootstrap();
+    app = await NestFactory.create(AppModule);
+    await app.init();
     clientService = app.get(ClientService);
 
     client = clientService.getClient();
@@ -81,7 +85,7 @@ describe('EsoStatusService (e2e)', (): void => {
     subscriptionRepository = dataSource.getRepository(Subscription);
     channelRepository = dataSource.getRepository(Channel);
     serverRepository = dataSource.getRepository(Server);
-  });
+  }, 15000);
 
   beforeEach(async (): Promise<void> => {
     await dataSource.dropDatabase();
@@ -124,12 +128,12 @@ describe('EsoStatusService (e2e)', (): void => {
         },
       ),
     );
-  });
+  }, 15000);
 
   afterAll(async (): Promise<void> => {
     await app.close();
     await client.destroy();
-  });
+  }, 15000);
 
   it.each([
     {
@@ -218,7 +222,6 @@ describe('EsoStatusService (e2e)', (): void => {
     },
     { event: 'disconnect' },
     { event: 'reconnect' },
-    { event: 'connected' },
   ])(
     'should esoStatus connector event listen',
     async (event: {

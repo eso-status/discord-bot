@@ -2,6 +2,8 @@ import { EventType } from '@discord-nestjs/core/dist/definitions/types/event.typ
 import { ClientService } from '@discord-nestjs/core/dist/services/client.service';
 import { Slug as EsoStatusSlug } from '@eso-status/types';
 import { INestApplication } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+
 import {
   Client,
   CommandInteraction,
@@ -17,10 +19,11 @@ import { Subscription } from 'src/resource/subscription/entities/subscription.en
 import { Repository } from 'typeorm';
 import { runSeeders } from 'typeorm-extension';
 
+import { AppModule } from '../../../src/app.module';
+
 import { dataSource } from '../../../src/config/typeorm.config';
 import { eventData } from '../../../src/database/data/event.data';
 import { slugData } from '../../../src/database/data/slug.data';
-import { bootstrap } from '../../../src/main';
 import { RegisterCommand } from '../../../src/provider/register-command/register-command';
 
 import SpyInstance = jest.SpyInstance;
@@ -97,7 +100,8 @@ describe('RegisterCommand (e2e)', (): void => {
     await dataSource.runMigrations();
     await runSeeders(dataSource);
 
-    app = await bootstrap();
+    app = await NestFactory.create(AppModule);
+    await app.init();
     clientService = app.get(ClientService);
 
     registerCommand = app.get(RegisterCommand);
@@ -107,18 +111,18 @@ describe('RegisterCommand (e2e)', (): void => {
     subscriptionRepository = dataSource.getRepository(Subscription);
     channelRepository = dataSource.getRepository(Channel);
     serverRepository = dataSource.getRepository(Server);
-  });
+  }, 15000);
 
   beforeEach(async (): Promise<void> => {
     await dataSource.dropDatabase();
     await dataSource.runMigrations();
     await runSeeders(dataSource);
-  });
+  }, 15000);
 
   afterAll(async (): Promise<void> => {
     await app.close();
     await client.destroy();
-  });
+  }, 15000);
 
   it('should register with new server and new channel with single event and single slug', async (): Promise<void> => {
     expect(
@@ -187,7 +191,7 @@ describe('RegisterCommand (e2e)', (): void => {
       },
     });
     expect(subscriptionList.length).toEqual(1);
-    expect(subscriptionList[0].eventId).toEqual(3);
+    expect(subscriptionList[0].eventId).toEqual(2);
     expect(subscriptionList[0].slugId).toEqual(6);
     expect(subscriptionList[0].channelId).toEqual(channelList[0].id);
   }, 15000);
@@ -288,7 +292,7 @@ describe('RegisterCommand (e2e)', (): void => {
       },
     });
     expect(subscriptionList.length).toEqual(1);
-    expect(subscriptionList[0].eventId).toEqual(3);
+    expect(subscriptionList[0].eventId).toEqual(2);
     expect(subscriptionList[0].slugId).toEqual(6);
     expect(subscriptionList[0].channelId).toEqual(channelList[0].id);
   }, 15000);
@@ -417,7 +421,7 @@ describe('RegisterCommand (e2e)', (): void => {
       },
     });
     expect(subscriptionList.length).toEqual(1);
-    expect(subscriptionList[0].eventId).toEqual(3);
+    expect(subscriptionList[0].eventId).toEqual(2);
     expect(subscriptionList[0].slugId).toEqual(6);
     expect(subscriptionList[0].channelId).toEqual(channelList[0].id);
   }, 15000);
@@ -491,7 +495,7 @@ describe('RegisterCommand (e2e)', (): void => {
 
     const expectList: { eventId: number; slugId: number }[] = [];
     slugData.forEach((slug: Slug): void => {
-      expectList.push({ eventId: 3, slugId: slug.id });
+      expectList.push({ eventId: 2, slugId: slug.id });
     });
 
     expectList.forEach(

@@ -7,22 +7,14 @@ export const eventData: Event[] = [
   },
   {
     id: 2,
-    event: 'maintenanceRemoved',
-  },
-  {
-    id: 3,
     event: 'statusUpdate',
   },
   {
-    id: 4,
+    id: 3,
     event: 'disconnect',
   },
   {
-    id: 5,
+    id: 4,
     event: 'reconnect',
-  },
-  {
-    id: 6,
-    event: 'connected',
   },
 ];

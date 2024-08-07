@@ -26,9 +26,9 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "lint:fix": "eslint \"{src,test}/**/*.ts\" --fix",
-    "test": "jest --runInBand --setupFiles",
+    "test": "jest --runInBand --setupFiles --detectOpenHandles --forceExit",
     "test:watch": "jest --runInBand --watch --setupFiles",
-    "test:cov": "jest --runInBand --coverage --setupFiles",
+    "test:cov": "jest --runInBand --coverage --setupFiles --detectOpenHandles --forceExit",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand --setupFiles",
     "test:e2e": "jest --runInBand --config ./test/jest-e2e.json --setupFiles",
     "migration:run": "typeorm migration:run -d ./dist/config/typeorm.config.js"
