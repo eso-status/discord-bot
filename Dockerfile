@@ -8,8 +8,8 @@ COPY ./.env.example .
 COPY ./package.json .
 COPY ./start.sh /tmp/start.sh
 
-RUN chown node:node -R ./
-RUN chown node:node -R /tmp/start.sh
+RUN chown node:node -R ./ \
+&& chown node:node -R /tmp/start.sh
 
 USER node
 
