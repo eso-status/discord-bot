@@ -12,10 +12,9 @@ COPY ./.env.example .
 COPY ./package.json .
 COPY ./start.sh /tmp/start.sh
 
-RUN setcap 'cap_net_bind_service=+ep' `readlink -f \`which node\``
-
-RUN chown node:node -R ./
-RUN chown node:node -R /tmp/start.sh
+RUN setcap 'cap_net_bind_service=+ep' `readlink -f \`which node\`` \
+&& chown node:node -R ./ \
+&& chown node:node -R /tmp/start.sh
 
 USER node
 
