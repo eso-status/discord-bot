@@ -29,8 +29,6 @@ jobs:
       - name: Create env file
         run: |
           cat .env.example > .env
-          sed -i -e "s/__NODE_ENV__/testing/g" ./.env
-          sed -i -e "s/__APP_NAME__/eso-status-discord-bot/g" ./.env
           sed -i -e "s/__DB_TYPE__/sqlite/g" ./.env
           sed -i -e "s/__DB_HOST__//g" ./.env
           sed -i -e "s/__DB_PORT__//g" ./.env

@@ -2,8 +2,6 @@
 
 # SETUP ENV FILE
 cat ./.env.example > ./.env
-sed -i -e "s/__NODE_ENV__/$NODE_ENV/g" ./.env
-sed -i -e "s/__APP_NAME__/$APP_NAME/g" ./.env
 sed -i -e "s/__DB_TYPE__/$DB_TYPE/g" ./.env
 sed -i -e "s/__DB_HOST__/$DB_HOST/g" ./.env
 sed -i -e "s/__DB_PORT__/$DB_PORT/g" ./.env
@@ -12,8 +10,8 @@ sed -i -e "s/__DB_USER__/$DB_USER/g" ./.env
 sed -i -e "s/__DB_PASSWORD__/$DB_PASSWORD/g" ./.env
 sed -i -e "s/__DB_DEBUG__/$DB_DEBUG/g" ./.env
 sed -i -e "s/__DISCORD_TOKEN__/$DISCORD_TOKEN/g" ./.env
-sed -i -e "s/__DISCORD_TESTING_GUILDID__/$DISCORD_TESTING_GUILDID/g" ./.env
-sed -i -e "s/__DISCORD_TESTING_CHANNELID__/$DISCORD_TESTING_CHANNELID/g" ./.env
+sed -i -e "s/__DISCORD_TESTING_GUILDID__//g" ./.env
+sed -i -e "s/__DISCORD_TESTING_CHANNELID__//g" ./.env
 
 ## RUN DATABASE MIGRATION
 npm run migration:run

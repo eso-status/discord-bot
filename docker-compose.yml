@@ -3,8 +3,8 @@ services:
 #    deploy:
 #      resources:
 #        limits:
-#          cpus: '0.5'
-#          memory: 1G
+#          cpus: '0.25'
+#          memory: 0.5G
 #    env_file: .env
 #    container_name: node_discord_bot_eso_status
 #    image: dov118/eso_status_discord_bot:1.0.0-dev.1
