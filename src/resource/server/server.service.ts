@@ -11,7 +11,7 @@ export class ServerService {
     private readonly serverRepository: Repository<Server>,
   ) {}
 
-  async getByServerId(serverId: string): Promise<Server> {
+  public async getByServerId(serverId: string): Promise<Server> {
     return this.serverRepository.findOne({
       where: {
         serverId,
@@ -19,7 +19,7 @@ export class ServerService {
     });
   }
 
-  async add(serverId: string): Promise<Server> {
+  public async add(serverId: string): Promise<Server> {
     return this.serverRepository.save(
       this.serverRepository.create({
         serverId,

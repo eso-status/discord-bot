@@ -14,7 +14,7 @@ export class ChannelService {
     private readonly channelRepository: Repository<Channel>,
   ) {}
 
-  async getByChannelId(channelId: string): Promise<Channel> {
+  public async getByChannelId(channelId: string): Promise<Channel> {
     return this.channelRepository.findOne({
       relations: ['subscriptions'],
       where: {
@@ -23,7 +23,7 @@ export class ChannelService {
     });
   }
 
-  async add(channelId: string, serverId: number): Promise<Channel> {
+  public async add(channelId: string, serverId: number): Promise<Channel> {
     return this.channelRepository.save(
       this.channelRepository.create({
         channelId,
@@ -32,7 +32,7 @@ export class ChannelService {
     );
   }
 
-  async getBySubscriptionEvent(event: EventType): Promise<Channel[]> {
+  public async getBySubscriptionEvent(event: EventType): Promise<Channel[]> {
     return this.channelRepository.find({
       relations: ['subscriptions', 'subscriptions.event'],
       where: {
@@ -45,7 +45,7 @@ export class ChannelService {
     });
   }
 
-  async getBySubscriptionEventAndSlug(
+  public async getBySubscriptionEventAndSlug(
     event: EventType,
     slug: Slug,
   ): Promise<Channel[]> {

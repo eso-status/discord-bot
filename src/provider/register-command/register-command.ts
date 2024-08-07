@@ -36,7 +36,7 @@ export class RegisterCommand {
   ) {}
 
   @Handler()
-  async onRegister(
+  public async onRegister(
     @IA(SlashCommandPipe) dto: RegisterDto,
     @IA() interaction: CommandInteraction,
   ): Promise<string> {
@@ -48,7 +48,7 @@ export class RegisterCommand {
     );
   }
 
-  async doOnRegister(
+  public async doOnRegister(
     guildId: string,
     channelId: string,
     event: EventType,

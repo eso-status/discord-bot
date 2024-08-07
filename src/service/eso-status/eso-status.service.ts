@@ -19,7 +19,7 @@ export class EsoStatusService {
     private readonly client: Client,
   ) {
     let esoStatusEventEmitter: EsoStatusConnector;
-    this.client.on('ready', () => {
+    this.client.on('ready', (): void => {
       esoStatusEventEmitter = EsoStatusConnector.listen();
       esoStatusEventEmitter.emit = (function replaceEmit(
         original: any,
@@ -37,7 +37,10 @@ export class EsoStatusService {
     });
   }
 
-  async sendMessage(channelId: string, message: EmbedBuilder): Promise<void> {
+  public async sendMessage(
+    channelId: string,
+    message: EmbedBuilder,
+  ): Promise<void> {
     const channel: TextChannel = this.client.channels.cache.get(
       channelId,
     ) as TextChannel;
@@ -99,7 +102,7 @@ export class EsoStatusService {
   }
 
   @OnEvent('esoStatus.disconnect')
-  async disconnect() {
+  public async disconnect() {
     const channelList: Channel[] =
       await this.channelService.getBySubscriptionEvent('disconnect');
 
@@ -115,7 +118,7 @@ export class EsoStatusService {
   }
 
   @OnEvent('esoStatus.reconnect')
-  async reconnect() {
+  public async reconnect() {
     const channelList: Channel[] =
       await this.channelService.getBySubscriptionEvent('reconnect');
 
@@ -131,7 +134,7 @@ export class EsoStatusService {
   }
 
   @OnEvent('esoStatus.maintenancePlanned')
-  async maintenancePlanned(maintenanceEsoStatus: MaintenanceEsoStatus) {
+  public async maintenancePlanned(maintenanceEsoStatus: MaintenanceEsoStatus) {
     const channelList: Channel[] =
       await this.channelService.getBySubscriptionEventAndSlug(
         'maintenancePlanned',
@@ -150,7 +153,7 @@ export class EsoStatusService {
   }
 
   @OnEvent('esoStatus.statusUpdate')
-  async statusUpdate(esoStatus: EsoStatus) {
+  public async statusUpdate(esoStatus: EsoStatus) {
     const channelList: Channel[] =
       await this.channelService.getBySubscriptionEventAndSlug(
         'statusUpdate',

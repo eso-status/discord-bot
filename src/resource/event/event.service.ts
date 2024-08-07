@@ -13,11 +13,11 @@ export class EventService {
     private readonly eventRepository: Repository<Event>,
   ) {}
 
-  async getAll(): Promise<Event[]> {
+  public async getAll(): Promise<Event[]> {
     return this.eventRepository.find();
   }
 
-  async getByEvent(event: EventType): Promise<Event> {
+  public async getByEvent(event: EventType): Promise<Event> {
     return this.eventRepository.findOne({
       where: {
         event,

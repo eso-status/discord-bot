@@ -39,7 +39,7 @@ const testCommand = (
   channelId: string,
   event: EventType = 'all',
   slug: EsoStatusSlug = <EsoStatusSlug>'all',
-) => {
+): void => {
   const commandInteractionOptionList: CommandInteractionOption[] = [];
   let commandInteractionOptionEvent: CommandInteractionOption;
   let commandInteractionOptionSlug: CommandInteractionOption;

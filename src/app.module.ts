@@ -25,9 +25,7 @@ import { EsoStatusService } from './service/eso-status/eso-status.service';
     DiscordModule.forRootAsync(discordConfig),
     TypeOrmModule.forRoot(dataSourceOptions),
     TypeOrmModule.forFeature([Event, Slug, Server, Channel, Subscription]),
-    DiscordModule.forFeature(),
   ],
-  controllers: [],
   providers: [
     EventService,
     SlugService,
@@ -36,17 +34,6 @@ import { EsoStatusService } from './service/eso-status/eso-status.service';
     SubscriptionService,
     RegisterCommand,
     EsoStatusService,
-    DiscordModule,
-  ],
-  exports: [
-    EventService,
-    SlugService,
-    ServerService,
-    ChannelService,
-    SubscriptionService,
-    RegisterCommand,
-    EsoStatusService,
-    DiscordModule,
   ],
 })
 export class AppModule {}

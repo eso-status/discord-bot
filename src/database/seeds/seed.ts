@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { runSeeders } from 'typeorm-extension';
 
 import { dataSource } from '../../config/typeorm.config';

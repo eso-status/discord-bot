@@ -11,7 +11,7 @@ export class SubscriptionService {
     private readonly subscriptionRepository: Repository<Subscription>,
   ) {}
 
-  async add(
+  public async add(
     channelId: number,
     eventId: number,
     slugId: number,
@@ -25,7 +25,7 @@ export class SubscriptionService {
     );
   }
 
-  async deleteByChannelId(channelId: number): Promise<void> {
+  public async deleteByChannelId(channelId: number): Promise<void> {
     const subscriptionList: Subscription[] =
       await this.subscriptionRepository.find({
         relations: ['channel'],
