@@ -3,19 +3,17 @@ services:
 #    deploy:
 #      resources:
 #        limits:
-#          cpus: '0.5'
-#          memory: 1G
-#    env_file: .env.production
+#          cpus: '0.25'
+#          memory: 0.5G
+#    env_file: .env
 #    container_name: node_discord_bot_eso_status
-#    image: dov118/eso_status_api:1.0.0-dev.8
+#    image: dov118/eso_status_discord_bot:1.0.0-dev.1
 ##    build:
 ##      context: .
 ##      dockerfile: Dockerfile
 #    depends_on:
 #      mysql_discord_bot_eso_status:
 #        condition: service_healthy
-#    ports:
-#      - "443:443"
   mysql_discord_bot_eso_status:
     deploy:
       resources:

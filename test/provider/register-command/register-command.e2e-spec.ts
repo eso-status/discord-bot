@@ -128,7 +128,7 @@ describe('RegisterCommand (e2e)', (): void => {
     expect(
       await serverRepository.count({
         where: {
-          serverId: '382941103063564288',
+          serverId: process.env.DISCORD_TESTING_GUILDID,
         },
       }),
     ).toEqual(0);
@@ -136,7 +136,7 @@ describe('RegisterCommand (e2e)', (): void => {
     expect(
       await channelRepository.count({
         where: {
-          channelId: '609315815770161162',
+          channelId: process.env.DISCORD_TESTING_CHANNELID,
         },
       }),
     ).toEqual(0);
@@ -149,8 +149,8 @@ describe('RegisterCommand (e2e)', (): void => {
             'register',
             doOnRegister,
             resolve,
-            '382941103063564288',
-            '609315815770161162',
+            process.env.DISCORD_TESTING_GUILDID,
+            process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
             'server_pc_eu',
           );
@@ -161,8 +161,8 @@ describe('RegisterCommand (e2e)', (): void => {
             'register',
             doOnRegister,
             resolve,
-            '382941103063564288',
-            '609315815770161162',
+            process.env.DISCORD_TESTING_GUILDID,
+            process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
             'server_pc_eu',
           );
@@ -172,14 +172,14 @@ describe('RegisterCommand (e2e)', (): void => {
 
     const serverList: Server[] = await serverRepository.find({
       where: {
-        serverId: '382941103063564288',
+        serverId: process.env.DISCORD_TESTING_GUILDID,
       },
     });
     expect(serverList.length).toEqual(1);
 
     const channelList: Channel[] = await channelRepository.find({
       where: {
-        channelId: '609315815770161162',
+        channelId: process.env.DISCORD_TESTING_CHANNELID,
       },
     });
     expect(channelList.length).toEqual(1);
@@ -199,13 +199,13 @@ describe('RegisterCommand (e2e)', (): void => {
   it('should register with not new server and new channel with single event and single slug', async (): Promise<void> => {
     const server: Server = await serverRepository.save(
       serverRepository.create({
-        serverId: '382941103063564288',
+        serverId: process.env.DISCORD_TESTING_GUILDID,
       }),
     );
 
     await channelRepository.save(
       channelRepository.create({
-        channelId: '609315815770161163',
+        channelId: '1234',
         serverId: server.id,
       }),
     );
@@ -213,7 +213,7 @@ describe('RegisterCommand (e2e)', (): void => {
     expect(
       await serverRepository.count({
         where: {
-          serverId: '382941103063564288',
+          serverId: process.env.DISCORD_TESTING_GUILDID,
         },
       }),
     ).toEqual(1);
@@ -229,7 +229,7 @@ describe('RegisterCommand (e2e)', (): void => {
     expect(
       await channelRepository.count({
         where: {
-          channelId: '609315815770161162',
+          channelId: process.env.DISCORD_TESTING_CHANNELID,
         },
       }),
     ).toEqual(0);
@@ -242,8 +242,8 @@ describe('RegisterCommand (e2e)', (): void => {
             'register',
             doOnRegister,
             resolve,
-            '382941103063564288',
-            '609315815770161162',
+            process.env.DISCORD_TESTING_GUILDID,
+            process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
             'server_pc_eu',
           );
@@ -254,8 +254,8 @@ describe('RegisterCommand (e2e)', (): void => {
             'register',
             doOnRegister,
             resolve,
-            '382941103063564288',
-            '609315815770161162',
+            process.env.DISCORD_TESTING_GUILDID,
+            process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
             'server_pc_eu',
           );
@@ -265,7 +265,7 @@ describe('RegisterCommand (e2e)', (): void => {
 
     const serverList: Server[] = await serverRepository.find({
       where: {
-        serverId: '382941103063564288',
+        serverId: process.env.DISCORD_TESTING_GUILDID,
       },
     });
     expect(serverList.length).toEqual(1);
@@ -280,7 +280,7 @@ describe('RegisterCommand (e2e)', (): void => {
 
     const channelList: Channel[] = await channelRepository.find({
       where: {
-        channelId: '609315815770161162',
+        channelId: process.env.DISCORD_TESTING_CHANNELID,
       },
     });
     expect(channelList.length).toEqual(1);
@@ -300,13 +300,13 @@ describe('RegisterCommand (e2e)', (): void => {
   it('should register with not new server and not new channel with single event and single slug', async (): Promise<void> => {
     const server: Server = await serverRepository.save(
       serverRepository.create({
-        serverId: '382941103063564288',
+        serverId: process.env.DISCORD_TESTING_GUILDID,
       }),
     );
 
     const channel: Channel = await channelRepository.save(
       channelRepository.create({
-        channelId: '609315815770161162',
+        channelId: process.env.DISCORD_TESTING_CHANNELID,
         serverId: server.id,
       }),
     );
@@ -314,7 +314,7 @@ describe('RegisterCommand (e2e)', (): void => {
     expect(
       await serverRepository.count({
         where: {
-          serverId: '382941103063564288',
+          serverId: process.env.DISCORD_TESTING_GUILDID,
         },
       }),
     ).toEqual(1);
@@ -330,7 +330,7 @@ describe('RegisterCommand (e2e)', (): void => {
     expect(
       await channelRepository.count({
         where: {
-          channelId: '609315815770161162',
+          channelId: process.env.DISCORD_TESTING_CHANNELID,
         },
       }),
     ).toEqual(1);
@@ -371,8 +371,8 @@ describe('RegisterCommand (e2e)', (): void => {
             'register',
             doOnRegister,
             resolve,
-            '382941103063564288',
-            '609315815770161162',
+            process.env.DISCORD_TESTING_GUILDID,
+            process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
             'server_pc_eu',
           );
@@ -383,8 +383,8 @@ describe('RegisterCommand (e2e)', (): void => {
             'register',
             doOnRegister,
             resolve,
-            '382941103063564288',
-            '609315815770161162',
+            process.env.DISCORD_TESTING_GUILDID,
+            process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
             'server_pc_eu',
           );
@@ -394,7 +394,7 @@ describe('RegisterCommand (e2e)', (): void => {
 
     const serverList: Server[] = await serverRepository.find({
       where: {
-        serverId: '382941103063564288',
+        serverId: process.env.DISCORD_TESTING_GUILDID,
       },
     });
     expect(serverList.length).toEqual(1);
@@ -409,7 +409,7 @@ describe('RegisterCommand (e2e)', (): void => {
 
     const channelList: Channel[] = await channelRepository.find({
       where: {
-        channelId: '609315815770161162',
+        channelId: process.env.DISCORD_TESTING_CHANNELID,
       },
     });
     expect(channelList.length).toEqual(1);
@@ -430,7 +430,7 @@ describe('RegisterCommand (e2e)', (): void => {
     expect(
       await serverRepository.count({
         where: {
-          serverId: '382941103063564288',
+          serverId: process.env.DISCORD_TESTING_GUILDID,
         },
       }),
     ).toEqual(0);
@@ -438,7 +438,7 @@ describe('RegisterCommand (e2e)', (): void => {
     expect(
       await channelRepository.count({
         where: {
-          channelId: '609315815770161162',
+          channelId: process.env.DISCORD_TESTING_CHANNELID,
         },
       }),
     ).toEqual(0);
@@ -451,8 +451,8 @@ describe('RegisterCommand (e2e)', (): void => {
             'register',
             doOnRegister,
             resolve,
-            '382941103063564288',
-            '609315815770161162',
+            process.env.DISCORD_TESTING_GUILDID,
+            process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
           );
         }
@@ -462,8 +462,8 @@ describe('RegisterCommand (e2e)', (): void => {
             'register',
             doOnRegister,
             resolve,
-            '382941103063564288',
-            '609315815770161162',
+            process.env.DISCORD_TESTING_GUILDID,
+            process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
           );
         });
@@ -472,14 +472,14 @@ describe('RegisterCommand (e2e)', (): void => {
 
     const serverList: Server[] = await serverRepository.find({
       where: {
-        serverId: '382941103063564288',
+        serverId: process.env.DISCORD_TESTING_GUILDID,
       },
     });
     expect(serverList.length).toEqual(1);
 
     const channelList: Channel[] = await channelRepository.find({
       where: {
-        channelId: '609315815770161162',
+        channelId: process.env.DISCORD_TESTING_CHANNELID,
       },
     });
     expect(channelList.length).toEqual(1);
@@ -511,7 +511,7 @@ describe('RegisterCommand (e2e)', (): void => {
     expect(
       await serverRepository.count({
         where: {
-          serverId: '382941103063564288',
+          serverId: process.env.DISCORD_TESTING_GUILDID,
         },
       }),
     ).toEqual(0);
@@ -519,7 +519,7 @@ describe('RegisterCommand (e2e)', (): void => {
     expect(
       await channelRepository.count({
         where: {
-          channelId: '609315815770161162',
+          channelId: process.env.DISCORD_TESTING_CHANNELID,
         },
       }),
     ).toEqual(0);
@@ -532,8 +532,8 @@ describe('RegisterCommand (e2e)', (): void => {
             'register',
             doOnRegister,
             resolve,
-            '382941103063564288',
-            '609315815770161162',
+            process.env.DISCORD_TESTING_GUILDID,
+            process.env.DISCORD_TESTING_CHANNELID,
           );
         }
         client.on('ready', (): void => {
@@ -542,8 +542,8 @@ describe('RegisterCommand (e2e)', (): void => {
             'register',
             doOnRegister,
             resolve,
-            '382941103063564288',
-            '609315815770161162',
+            process.env.DISCORD_TESTING_GUILDID,
+            process.env.DISCORD_TESTING_CHANNELID,
           );
         });
       },
@@ -551,14 +551,14 @@ describe('RegisterCommand (e2e)', (): void => {
 
     const serverList: Server[] = await serverRepository.find({
       where: {
-        serverId: '382941103063564288',
+        serverId: process.env.DISCORD_TESTING_GUILDID,
       },
     });
     expect(serverList.length).toEqual(1);
 
     const channelList: Channel[] = await channelRepository.find({
       where: {
-        channelId: '609315815770161162',
+        channelId: process.env.DISCORD_TESTING_CHANNELID,
       },
     });
     expect(channelList.length).toEqual(1);
