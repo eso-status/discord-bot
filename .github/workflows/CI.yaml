@@ -34,7 +34,7 @@ jobs:
           sed -i -e "s/__DB_TYPE__/sqlite/g" ./.env
           sed -i -e "s/__DB_HOST__//g" ./.env
           sed -i -e "s/__DB_PORT__//g" ./.env
-          sed -i -e "s/__DB_NAME__/src/database/dev/g" ./.env
+          sed -i -e "s#__DB_NAME__#src/database/dev#g" ./.env
           sed -i -e "s/__DB_USER__//g" ./.env
           sed -i -e "s/__DB_PASSWORD__//g" ./.env
           sed -i -e "s/__DB_DEBUG__//g" ./.env
