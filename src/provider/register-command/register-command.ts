@@ -58,26 +58,29 @@ export class RegisterCommand {
     ) as TextChannel;
     await channel?.send({
       embeds: [
-        new EmbedBuilder()
-          .setColor('#0d1118')
-          .setDescription(
-            await this.doOnRegister(
-              interaction.guildId,
-              interaction.channelId,
-              dto.event,
-              dto.slug,
-            ),
-          )
-          .setTimestamp()
-          .setFooter({
-            text: 'Data from https://api.eso-status.com/v2/service',
-            iconURL:
-              'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
-          }),
+        this.generateEmbed(
+          await this.doOnRegister(
+            interaction.guildId,
+            interaction.channelId,
+            dto.event,
+            dto.slug,
+          ),
+        ),
       ],
     });
 
     return {};
+  }
+
+  public generateEmbed(message: string): EmbedBuilder {
+    return new EmbedBuilder()
+      .setColor('#0d1118')
+      .setDescription(message)
+      .setTimestamp()
+      .setFooter({
+        text: 'Data from https://api.eso-status.com/v2/service',
+        iconURL: 'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
+      });
   }
 
   public async doOnRegister(
