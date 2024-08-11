@@ -17,4 +17,8 @@ export const eventData: Event[] = [
     id: 4,
     event: 'reconnect',
   },
+  {
+    id: 5,
+    event: 'connected',
+  },
 ];

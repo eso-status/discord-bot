@@ -1,8 +1,11 @@
+import { config } from 'dotenv';
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 import { runSeeder } from 'typeorm-extension';
 
 import { dataSource } from '../../config/typeorm.config';
 import { EventSeeder } from '../seeds/event.seeder';
+
+config();
 
 export class CreateEventTable1722942826488 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

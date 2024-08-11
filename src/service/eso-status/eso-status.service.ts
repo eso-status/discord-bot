@@ -101,6 +101,22 @@ export class EsoStatusService {
       });
   }
 
+  @OnEvent('esoStatus.connected')
+  public async connected() {
+    const channelList: Channel[] =
+      await this.channelService.getBySubscriptionEvent('connected');
+
+    await Promise.all(
+      channelList.map(
+        async (channel: Channel): Promise<void> =>
+          this.sendMessage(
+            channel.channelId,
+            this.generateListenerStatusEmbed('Eso status API connected!'),
+          ),
+      ),
+    );
+  }
+
   @OnEvent('esoStatus.disconnect')
   public async disconnect() {
     const channelList: Channel[] =

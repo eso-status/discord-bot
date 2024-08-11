@@ -220,6 +220,7 @@ describe('EsoStatusService (e2e)', (): void => {
         },
       },
     },
+    { event: 'connected' },
     { event: 'disconnect' },
     { event: 'reconnect' },
   ])(
