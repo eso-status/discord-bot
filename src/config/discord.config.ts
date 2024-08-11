@@ -11,7 +11,7 @@ const discordConfig: DiscordModuleAsyncOptions = {
   useFactory: (): DiscordModuleOption => ({
     token: process.env.DISCORD_TOKEN,
     discordClientOptions: {
-      intents: [GatewayIntentBits.Guilds],
+      intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
     },
   }),
 };
