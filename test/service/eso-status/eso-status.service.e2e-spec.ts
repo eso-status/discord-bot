@@ -107,7 +107,13 @@ describe('EsoStatusService (e2e)', (): void => {
 
     const subscriptionDataList: { eventId: number; slugId: number }[] = [];
     slugData.forEach((slug: Slug): void => {
-      eventData.forEach((event: Event): void => {
+      [
+        ...eventData,
+        {
+          id: 5,
+          event: 'connected',
+        },
+      ].forEach((event: Event): void => {
         subscriptionDataList.push({ eventId: event.id, slugId: slug.id });
       });
     });
