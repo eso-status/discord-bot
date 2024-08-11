@@ -11,7 +11,7 @@ import {
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
-import { Client } from 'discord.js';
+import {Client, Embed} from 'discord.js';
 
 import { config } from 'dotenv';
 import * as moment from 'moment/moment';
@@ -136,15 +136,28 @@ describe('EsoStatusService (e2e)', (): void => {
     );
   }, 15000);
 
-  afterAll(async (): Promise<void> => {
-    await app.close();
-    await client.destroy();
-  }, 15000);
-
-  it.each([
+  it.each(<
+    {
+      event: EventType;
+      message?: Embed;
+      data?: EsoStatus | MaintenanceEsoStatus | EsoStatusSlug;
+    }[]
+    >[
     {
       event: 'maintenancePlanned',
-      data: <MaintenanceEsoStatus>{
+      message: {
+        data: {
+          title: 'New maintenance planned!',
+          description:
+            '• PC/Mac: NA and EU megaservers for patch maintenance – July 29, 4:00AM EDT (8:00 UTC) – 8:00AM EDT (12:00 UTC)',
+          footer: {
+            text: 'Data from https://api.eso-status.com/v2/service',
+            icon_url:
+              'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
+          },
+        },
+      },
+      data: {
         raw: {
           sources: ['https://forums.elderscrollsonline.com/'],
           raw: [
@@ -206,7 +219,18 @@ describe('EsoStatusService (e2e)', (): void => {
     },
     {
       event: 'statusUpdate',
-      data: <EsoStatus>{
+      message: {
+        data: {
+          title: 'Eso Status service status changed!',
+          description: '**PC-EU** => :white_check_mark:',
+          footer: {
+            text: 'Data from https://api.eso-status.com/v2/service',
+            icon_url:
+              'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
+          },
+        },
+      },
+      data: {
         slug: 'server_pc_eu',
         status: 'up',
         type: 'server',
@@ -226,33 +250,74 @@ describe('EsoStatusService (e2e)', (): void => {
         },
       },
     },
-    { event: 'connected' },
-    { event: 'disconnect' },
-    { event: 'reconnect' },
+    {
+      event: 'disconnect',
+      message: {
+        data: {
+          description: 'Eso status API disconnected!',
+          footer: {
+            text: 'Data from https://api.eso-status.com/v2/service',
+            icon_url:
+              'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
+          },
+        },
+      },
+    },
+    {
+      event: 'reconnect',
+      message: {
+        data: {
+          description: 'Eso status API reconnected!',
+          footer: {
+            text: 'Data from https://api.eso-status.com/v2/service',
+            icon_url:
+              'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
+          },
+        },
+      },
+    },
+    {
+      event: 'connected',
+      message: {
+        data: {
+          description: 'Eso status API connected!',
+          footer: {
+            text: 'Data from https://api.eso-status.com/v2/service',
+            icon_url:
+              'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
+          },
+        },
+      },
+    },
   ])(
     'should esoStatus connector event listen',
     async (event: {
       event: EventType;
+      message?: Embed;
       data?: EsoStatus | MaintenanceEsoStatus | EsoStatusSlug;
     }): Promise<void> => {
       await new Promise<void>(
         (resolve: (value?: void | PromiseLike<void>) => void): void => {
           if (client.isReady()) {
             testEsoStatusEvent(
+              client,
               app,
               esoStatusServer,
               resolve,
               event.event,
+              event.message,
               event.data,
             );
           }
 
           client.on('ready', (): void => {
             testEsoStatusEvent(
+              client,
               app,
               esoStatusServer,
               resolve,
               event.event,
+              event.message,
               event.data,
             );
           });
