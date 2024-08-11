@@ -11,7 +11,7 @@ import {
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
-import {Client, Embed} from 'discord.js';
+import { Client, Embed, Message } from 'discord.js';
 
 import { config } from 'dotenv';
 import * as moment from 'moment/moment';
@@ -36,10 +36,12 @@ import SpyInstance = jest.SpyInstance;
 config();
 
 const testEsoStatusEvent = (
+  client: Client,
   app: INestApplication,
   esoStatusServer: EventEmitter,
   resolve: (value?: void | PromiseLike<void>) => void,
   event: EventType,
+  message: Embed,
   data?: EsoStatus | MaintenanceEsoStatus | EsoStatusSlug,
 ): void => {
   const method: SpyInstance<Promise<void>> = jest.spyOn(
@@ -48,12 +50,27 @@ const testEsoStatusEvent = (
     event,
   );
 
+  let dataOk: boolean = false;
+
+  client.on('messageCreate', (messageData: Message): void => {
+    if (
+      messageData.embeds[0].data.title === message.data.title &&
+      messageData.embeds[0].data.description === message.data.description &&
+      messageData.embeds[0].data.footer.text === message.data.footer.text &&
+      messageData.embeds[0].data.footer.icon_url ===
+        message.data.footer.icon_url
+    ) {
+      dataOk = true;
+    }
+  });
+
   esoStatusServer.emit(event, data);
 
   setTimeout((): void => {
-    expect(method).toHaveBeenCalledWith(data);
-    // TODO listen le chat pour voir si le méssage y est bien reçu
-    resolve();
+    if (dataOk) {
+      expect(method).toHaveBeenCalledWith(data);
+      resolve();
+    }
   }, 10000);
 };
 
@@ -107,13 +124,7 @@ describe('EsoStatusService (e2e)', (): void => {
 
     const subscriptionDataList: { eventId: number; slugId: number }[] = [];
     slugData.forEach((slug: Slug): void => {
-      [
-        ...eventData,
-        {
-          id: 5,
-          event: 'connected',
-        },
-      ].forEach((event: Event): void => {
+      eventData.forEach((event: Event): void => {
         subscriptionDataList.push({ eventId: event.id, slugId: slug.id });
       });
     });
@@ -136,13 +147,18 @@ describe('EsoStatusService (e2e)', (): void => {
     );
   }, 15000);
 
+  afterAll(async (): Promise<void> => {
+    await app.close();
+    await client.destroy();
+  }, 15000);
+
   it.each(<
     {
       event: EventType;
       message?: Embed;
       data?: EsoStatus | MaintenanceEsoStatus | EsoStatusSlug;
     }[]
-    >[
+  >[
     {
       event: 'maintenancePlanned',
       message: {
