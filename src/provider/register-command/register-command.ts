@@ -1,10 +1,21 @@
 import { SlashCommandPipe } from '@discord-nestjs/common';
-import { Command, Handler, IA } from '@discord-nestjs/core';
+import {
+  Command,
+  Handler,
+  IA,
+  InjectDiscordClient,
+} from '@discord-nestjs/core';
 
 import { Slug as EsoStatusSlug } from '@eso-status/types';
 
 import { Injectable } from '@nestjs/common';
-import { CommandInteraction } from 'discord.js';
+import {
+  Client,
+  CommandInteraction,
+  EmbedBuilder,
+  InteractionReplyOptions,
+  TextChannel,
+} from 'discord.js';
 import { Channel } from 'src/resource/channel/entities/channel.entity';
 
 import { Event } from 'src/resource/event/entities/event.entity';
@@ -33,19 +44,40 @@ export class RegisterCommand {
     private readonly serverService: ServerService,
     private readonly channelService: ChannelService,
     private readonly subscriptionService: SubscriptionService,
+    @InjectDiscordClient()
+    private readonly client: Client,
   ) {}
 
   @Handler()
   public async onRegister(
     @IA(SlashCommandPipe) dto: RegisterDto,
     @IA() interaction: CommandInteraction,
-  ): Promise<string> {
-    return this.doOnRegister(
-      interaction.guildId,
+  ): Promise<InteractionReplyOptions> {
+    const channel: TextChannel = this.client.channels.cache.get(
       interaction.channelId,
-      dto.event,
-      dto.slug,
-    );
+    ) as TextChannel;
+    await channel?.send({
+      embeds: [
+        new EmbedBuilder()
+          .setColor('#0d1118')
+          .setDescription(
+            await this.doOnRegister(
+              interaction.guildId,
+              interaction.channelId,
+              dto.event,
+              dto.slug,
+            ),
+          )
+          .setTimestamp()
+          .setFooter({
+            text: 'Data from https://api.eso-status.com/v2/service',
+            iconURL:
+              'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
+          }),
+      ],
+    });
+
+    return {};
   }
 
   public async doOnRegister(
@@ -89,6 +121,6 @@ export class RegisterCommand {
       }),
     );
 
-    return `Successfully registered!`;
+    return 'Successfully registered!';
   }
 }
