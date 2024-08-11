@@ -8,6 +8,7 @@ import {
   Client,
   CommandInteraction,
   CommandInteractionOption,
+  Message,
 } from 'discord.js';
 
 import { config } from 'dotenv';
@@ -52,6 +53,20 @@ const testCommand = (
     commandInteractionOptionList.push(commandInteractionOptionSlug);
   }
 
+  let dataOk: boolean = false;
+
+  client.on('messageCreate', (messageData: Message): void => {
+    if (
+      messageData.embeds[0].data.description === 'Successfully registered!' &&
+      messageData.embeds[0].data.footer.text ===
+        'Data from https://api.eso-status.com/v2/service' &&
+      messageData.embeds[0].data.footer.icon_url ===
+        'https://avatars.githubusercontent.com/u/87777413?s=200&v=4'
+    ) {
+      dataOk = true;
+    }
+  });
+
   // @ts-expect-error Necessary to emulate Interaction
   client.emit('interactionCreate', <CommandInteraction>{
     isChatInputCommand: (): boolean => true,
@@ -60,10 +75,7 @@ const testCommand = (
     commandName,
     options: {
       _hoistedOptions: commandInteractionOptionList,
-      get: (
-        name: string,
-        required?: boolean,
-      ): CommandInteractionOption | null => {
+      get: (name: string): CommandInteractionOption | null => {
         if (name === 'event' && event !== <EventType>'all') {
           return commandInteractionOptionEvent;
         }
@@ -78,9 +90,15 @@ const testCommand = (
   });
 
   setTimeout((): void => {
-    expect(doOnRegister).toHaveBeenCalledWith(guildId, channelId, event, slug);
-    // TODO listen le chat pour voir si le méssage y est bien reçu
-    resolve();
+    if (dataOk) {
+      expect(doOnRegister).toHaveBeenCalledWith(
+        guildId,
+        channelId,
+        event,
+        slug,
+      );
+      resolve();
+    }
   }, 10000);
 };
 

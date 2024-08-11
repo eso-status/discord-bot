@@ -6,8 +6,8 @@ on:
       - "release/*"
 
 jobs:
-  ci:
-    name: CI
+  cd:
+    name: CD
     runs-on: ubuntu-latest
     timeout-minutes: 30
     if: github.event.base_ref != 'refs/heads/main'
