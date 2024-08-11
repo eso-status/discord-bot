@@ -292,6 +292,19 @@ describe('EsoStatusService (e2e)', (): void => {
         },
       },
     },
+    {
+      event: 'connected',
+      message: {
+        data: {
+          description: 'Eso status API connected!',
+          footer: {
+            text: 'Data from https://api.eso-status.com/v2/service',
+            icon_url:
+              'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
+          },
+        },
+      },
+    },
   ])(
     'should esoStatus connector event listen',
     async (event: {
