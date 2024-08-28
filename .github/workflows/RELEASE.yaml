@@ -20,7 +20,7 @@ jobs:
 
       - uses: actions/setup-node@v4.0.3
         with:
-          node-version: 20.16.0
+          node-version: 20.17.0
 
       - name: Get version
         id: get_version
@@ -45,14 +45,14 @@ jobs:
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1.4.0
+        uses: aws-actions/amazon-ecs-render-task-definition@v1.5.0
         with:
           task-definition: "task-definition.json"
           container-name: ${{ secrets.DOCKER_HUB_REGISTRY }}
           image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.DOCKER_HUB_NAME }}/${{ secrets.DOCKER_HUB_REGISTRY }}:${{ steps.get_version.outputs.version }}
 
       - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1.6.0
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2.0.0
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ${{ secrets.ECS_SERVICE }}
