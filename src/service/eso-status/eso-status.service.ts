@@ -1,6 +1,6 @@
 import { InjectDiscordClient } from '@discord-nestjs/core';
 import { EsoStatusConnector } from '@eso-status/connector';
-import { EsoStatus, MaintenanceEsoStatus, Status } from '@eso-status/types';
+import { EsoStatus, EsoStatusMaintenance, Status } from '@eso-status/types';
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
@@ -74,12 +74,12 @@ export class EsoStatusService {
   }
 
   public generateMaintenancePlannedEmbed(
-    maintenanceEsoStatus: MaintenanceEsoStatus,
+    maintenanceEsoStatus: EsoStatusMaintenance,
   ): EmbedBuilder {
     return new EmbedBuilder()
       .setColor('#0d1118')
       .setTitle(`New maintenance planned!`)
-      .setDescription(maintenanceEsoStatus.raw.raw[0])
+      .setDescription(maintenanceEsoStatus.rawDataList[0].raw)
       .setTimestamp()
       .setFooter({
         text: 'Data from https://api.eso-status.com/v2/service',
@@ -150,11 +150,11 @@ export class EsoStatusService {
   }
 
   @OnEvent('esoStatus.maintenancePlanned')
-  public async maintenancePlanned(maintenanceEsoStatus: MaintenanceEsoStatus) {
+  public async maintenancePlanned(maintenanceEsoStatus: EsoStatusMaintenance) {
     const channelList: Channel[] =
       await this.channelService.getBySubscriptionEventAndSlug(
         'maintenancePlanned',
-        maintenanceEsoStatus.slug,
+        maintenanceEsoStatus.rawDataList[0].slug,
       );
 
     await Promise.all(
