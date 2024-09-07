@@ -5,7 +5,7 @@ import { ClientService } from '@discord-nestjs/core/dist/services/client.service
 import { EsoStatusConnector } from '@eso-status/connector';
 import {
   EsoStatus,
-  MaintenanceEsoStatus,
+  EsoStatusMaintenance,
   Slug as EsoStatusSlug,
 } from '@eso-status/types';
 import { INestApplication } from '@nestjs/common';
@@ -42,7 +42,7 @@ const testEsoStatusEvent = (
   resolve: (value?: void | PromiseLike<void>) => void,
   event: EventType,
   message: Embed,
-  data?: EsoStatus | MaintenanceEsoStatus | EsoStatusSlug,
+  data?: EsoStatus | EsoStatusMaintenance | EsoStatusSlug,
 ): void => {
   const method: SpyInstance<Promise<void>> = jest.spyOn(
     app.get(EsoStatusService),
@@ -156,7 +156,7 @@ describe('EsoStatusService (e2e)', (): void => {
     {
       event: EventType;
       message?: Embed;
-      data?: EsoStatus | MaintenanceEsoStatus | EsoStatusSlug;
+      data?: EsoStatus | EsoStatusMaintenance | EsoStatusSlug;
     }[]
   >[
     {
@@ -174,41 +174,40 @@ describe('EsoStatusService (e2e)', (): void => {
         },
       },
       data: {
-        raw: {
-          sources: ['https://forums.elderscrollsonline.com/'],
-          raw: [
-            '• PC/Mac: NA and EU megaservers for patch maintenance – July 29, 4:00AM EDT (8:00 UTC) – 8:00AM EDT (12:00 UTC)',
-          ],
-          slugs: ['server_pc_na'],
-          rawDate: 'July 29, 4:00AM EDT (8:00 UTC) – 8:00AM EDT (12:00 UTC)',
-          dates: [
-            moment()
-              .utc()
-              .set('years', 2024)
-              .set('months', 7)
-              .set('date', 29)
-              .set('hours', 8)
-              .set('minutes', 0)
-              .set('seconds', 0)
-              .set('milliseconds', 0)
-              .utcOffset(0),
-            moment()
-              .utc()
-              .set('years', 2024)
-              .set('months', 7)
-              .set('date', 29)
-              .set('hours', 12)
-              .set('minutes', 0)
-              .set('seconds', 0)
-              .set('milliseconds', 0)
-              .utcOffset(0),
-          ],
-          type: 'server',
-          support: 'pc',
-          zone: 'na',
-          status: 'planned',
-        },
-        slug: 'server_pc_na',
+        rawDataList: [
+          {
+            source: 'https://forums.elderscrollsonline.com/',
+            raw: '• PC/Mac: NA and EU megaservers for patch maintenance – July 29, 4:00AM EDT (8:00 UTC) – 8:00AM EDT (12:00 UTC)',
+            slug: 'server_pc_na',
+            rawDate: 'July 29, 4:00AM EDT (8:00 UTC) – 8:00AM EDT (12:00 UTC)',
+            dates: [
+              moment()
+                .utc()
+                .set('years', 2024)
+                .set('months', 7)
+                .set('date', 29)
+                .set('hours', 8)
+                .set('minutes', 0)
+                .set('seconds', 0)
+                .set('milliseconds', 0)
+                .utcOffset(0),
+              moment()
+                .utc()
+                .set('years', 2024)
+                .set('months', 7)
+                .set('date', 29)
+                .set('hours', 12)
+                .set('minutes', 0)
+                .set('seconds', 0)
+                .set('milliseconds', 0)
+                .utcOffset(0),
+            ],
+            type: 'server',
+            support: 'pc',
+            zone: 'na',
+            status: 'planned',
+          },
+        ],
         beginnerAt: moment()
           .utc()
           .set('years', 2024)
@@ -310,7 +309,7 @@ describe('EsoStatusService (e2e)', (): void => {
     async (event: {
       event: EventType;
       message?: Embed;
-      data?: EsoStatus | MaintenanceEsoStatus | EsoStatusSlug;
+      data?: EsoStatus | EsoStatusMaintenance | EsoStatusSlug;
     }): Promise<void> => {
       await new Promise<void>(
         (resolve: (value?: void | PromiseLike<void>) => void): void => {
