@@ -167,7 +167,7 @@ describe('EsoStatusService (e2e)', (): void => {
           description:
             '• PC/Mac: NA and EU megaservers for patch maintenance – July 29, 4:00AM EDT (8:00 UTC) – 8:00AM EDT (12:00 UTC)',
           footer: {
-            text: 'Data from https://api.eso-status.com/v2/service',
+            text: 'Data from https://preprod.api.eso-status.com/v3/service',
             icon_url:
               'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
           },
@@ -239,7 +239,7 @@ describe('EsoStatusService (e2e)', (): void => {
           title: 'Eso Status service status changed!',
           description: '**PC-EU** => :white_check_mark:',
           footer: {
-            text: 'Data from https://api.eso-status.com/v2/service',
+            text: 'Data from https://preprod.api.eso-status.com/v3/service',
             icon_url:
               'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
           },
@@ -271,7 +271,7 @@ describe('EsoStatusService (e2e)', (): void => {
         data: {
           description: 'Eso status API disconnected!',
           footer: {
-            text: 'Data from https://api.eso-status.com/v2/service',
+            text: 'Data from https://preprod.api.eso-status.com/v3/service',
             icon_url:
               'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
           },
@@ -284,7 +284,7 @@ describe('EsoStatusService (e2e)', (): void => {
         data: {
           description: 'Eso status API reconnected!',
           footer: {
-            text: 'Data from https://api.eso-status.com/v2/service',
+            text: 'Data from https://preprod.api.eso-status.com/v3/service',
             icon_url:
               'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
           },
@@ -297,7 +297,7 @@ describe('EsoStatusService (e2e)', (): void => {
         data: {
           description: 'Eso status API connected!',
           footer: {
-            text: 'Data from https://api.eso-status.com/v2/service',
+            text: 'Data from https://preprod.api.eso-status.com/v3/service',
             icon_url:
               'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
           },

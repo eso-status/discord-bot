@@ -59,7 +59,7 @@ const testCommand = (
     if (
       messageData.embeds[0].data.description === 'Successfully registered!' &&
       messageData.embeds[0].data.footer.text ===
-        'Data from https://api.eso-status.com/v2/service' &&
+        'Data from https://preprod.api.eso-status.com/v3/service' &&
       messageData.embeds[0].data.footer.icon_url ===
         'https://avatars.githubusercontent.com/u/87777413?s=200&v=4'
     ) {
