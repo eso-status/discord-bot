@@ -86,13 +86,16 @@ export class EsoStatusService {
   public generateMaintenancePlannedDescription(
     maintenanceEsoStatus: EsoStatusMaintenance,
   ): string {
+    const ending: string = maintenanceEsoStatus.endingAt
+      ? ` to ${moment(maintenanceEsoStatus.endingAt).utcOffset(0).format('H:mm')}`
+      : '';
     return `${maintenanceEsoStatus.rawDataList
       .map((rawData: EsoStatusRawData): string => {
         return `**${rawData.support.toUpperCase()}-${rawData.zone.toUpperCase()}**`;
       })
       .join(
         ' - ',
-      )} => ${moment(maintenanceEsoStatus.beginnerAt).utcOffset(0).format('dddd MMMM DD, YYYY')} from ${moment(maintenanceEsoStatus.beginnerAt).utcOffset(0).format('H:mm')}${maintenanceEsoStatus.endingAt ? ` to ${moment(maintenanceEsoStatus.endingAt).utcOffset(0).format('H:mm')}` : ''}`;
+      )} => ${moment(maintenanceEsoStatus.beginnerAt).utcOffset(0).format('dddd MMMM DD, YYYY')} from ${moment(maintenanceEsoStatus.beginnerAt).utcOffset(0).format('H:mm')}${ending}`;
   }
 
   public generateMaintenancePlannedEmbed(
