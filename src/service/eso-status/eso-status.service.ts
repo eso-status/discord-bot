@@ -1,10 +1,21 @@
 import { InjectDiscordClient } from '@discord-nestjs/core';
 import { EsoStatusConnector } from '@eso-status/connector';
-import { EsoStatus, EsoStatusMaintenance, Status } from '@eso-status/types';
+import {
+  DownStatus,
+  EsoStatus,
+  EsoStatusMaintenance,
+  EsoStatusRawData,
+  IssuesStatus,
+  PlannedStatus,
+  Status,
+  UpStatus,
+} from '@eso-status/types';
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
+
+import * as moment from 'moment/moment';
 
 import { ChannelService } from '../../resource/channel/channel.service';
 import { Channel } from '../../resource/channel/entities/channel.entity';
@@ -60,17 +71,28 @@ export class EsoStatusService {
 
   public getIconByStatus(status: Status): string {
     switch (status) {
-      case 'planned':
+      case PlannedStatus:
         return ':date:';
-      case 'down':
+      case DownStatus:
         return ':x:';
-      case 'up':
+      case UpStatus:
         return ':white_check_mark:';
-      case 'issues':
-        return ':wrench:';
+      case IssuesStatus:
       default:
-        return '';
+        return ':wrench:';
     }
+  }
+
+  public generateMaintenancePlannedDescription(
+    maintenanceEsoStatus: EsoStatusMaintenance,
+  ): string {
+    return `${maintenanceEsoStatus.rawDataList
+      .map((rawData: EsoStatusRawData): string => {
+        return `**${rawData.support.toUpperCase()}-${rawData.zone.toUpperCase()}**`;
+      })
+      .join(
+        ' - ',
+      )} => ${moment(maintenanceEsoStatus.beginnerAt).utcOffset(0).format('dddd MMMM DD, YYYY')} from ${moment(maintenanceEsoStatus.beginnerAt).utcOffset(0).format('H:mm')}${maintenanceEsoStatus.endingAt ? ` to ${moment(maintenanceEsoStatus.endingAt).utcOffset(0).format('H:mm')}` : ''}`;
   }
 
   public generateMaintenancePlannedEmbed(
@@ -79,7 +101,9 @@ export class EsoStatusService {
     return new EmbedBuilder()
       .setColor('#0d1118')
       .setTitle(`New maintenance planned!`)
-      .setDescription(maintenanceEsoStatus.rawDataList[0].raw)
+      .setDescription(
+        this.generateMaintenancePlannedDescription(maintenanceEsoStatus),
+      )
       .setTimestamp()
       .setFooter({
         text: 'Data from https://preprod.api.eso-status.com/v3/service',
