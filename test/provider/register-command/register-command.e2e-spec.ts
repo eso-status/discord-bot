@@ -1,6 +1,6 @@
 import { EventType } from '@discord-nestjs/core/dist/definitions/types/event.type';
 import { ClientService } from '@discord-nestjs/core/dist/services/client.service';
-import { Slug as EsoStatusSlug } from '@eso-status/types';
+import { ServerPcEuSlug, Slug as EsoStatusSlug } from '@eso-status/types';
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
@@ -170,7 +170,7 @@ describe('RegisterCommand (e2e)', (): void => {
             process.env.DISCORD_TESTING_GUILDID,
             process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
-            'server_pc_eu',
+            ServerPcEuSlug,
           );
         }
         client.on('ready', (): void => {
@@ -182,7 +182,7 @@ describe('RegisterCommand (e2e)', (): void => {
             process.env.DISCORD_TESTING_GUILDID,
             process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
-            'server_pc_eu',
+            ServerPcEuSlug,
           );
         });
       },
@@ -263,7 +263,7 @@ describe('RegisterCommand (e2e)', (): void => {
             process.env.DISCORD_TESTING_GUILDID,
             process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
-            'server_pc_eu',
+            ServerPcEuSlug,
           );
         }
         client.on('ready', (): void => {
@@ -275,7 +275,7 @@ describe('RegisterCommand (e2e)', (): void => {
             process.env.DISCORD_TESTING_GUILDID,
             process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
-            'server_pc_eu',
+            ServerPcEuSlug,
           );
         });
       },
@@ -392,7 +392,7 @@ describe('RegisterCommand (e2e)', (): void => {
             process.env.DISCORD_TESTING_GUILDID,
             process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
-            'server_pc_eu',
+            ServerPcEuSlug,
           );
         }
         client.on('ready', (): void => {
@@ -404,7 +404,7 @@ describe('RegisterCommand (e2e)', (): void => {
             process.env.DISCORD_TESTING_GUILDID,
             process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
-            'server_pc_eu',
+            ServerPcEuSlug,
           );
         });
       },
