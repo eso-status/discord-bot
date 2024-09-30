@@ -24,7 +24,7 @@ import { EventType } from '../../type/event.type';
 @Injectable()
 export class EsoStatusService {
   constructor(
-    private eventEmitter: EventEmitter2,
+    private readonly eventEmitter: EventEmitter2,
     private readonly channelService: ChannelService,
     @InjectDiscordClient()
     private readonly client: Client,
