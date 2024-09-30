@@ -1,52 +1,67 @@
+import {
+  ServerPcEuSlug,
+  ServerPcNaSlug,
+  ServerPcPtsSlug,
+  ServerPsEuSlug,
+  ServerPsNaSlug,
+  ServerXboxEuSlug,
+  ServerXboxNaSlug,
+  ServiceStoreCrownSlug,
+  ServiceStoreEsoSlug,
+  ServiceSystemAccountSlug,
+  ServiceWebForumSlug,
+  ServiceWebSiteSlug,
+} from '@eso-status/types';
+
 import { Slug } from '../../resource/slug/entities/slug.entity';
 
 export const slugData: Slug[] = [
   {
     id: 1,
-    slug: 'server_xbox_na',
+    slug: ServerXboxNaSlug,
   },
   {
     id: 2,
-    slug: 'server_xbox_eu',
+    slug: ServerXboxEuSlug,
   },
   {
     id: 3,
-    slug: 'server_ps_na',
+    slug: ServerPsNaSlug,
   },
   {
     id: 4,
-    slug: 'server_ps_eu',
+    slug: ServerPsEuSlug,
   },
   {
     id: 5,
-    slug: 'server_pc_na',
+    slug: ServerPcNaSlug,
   },
   {
     id: 6,
-    slug: 'server_pc_eu',
+    slug: ServerPcEuSlug,
   },
   {
     id: 7,
-    slug: 'server_pc_pts',
+    slug: ServerPcPtsSlug,
   },
   {
     id: 8,
-    slug: 'service_web_site',
+    slug: ServiceWebSiteSlug,
   },
   {
     id: 9,
-    slug: 'service_web_forum',
+    slug: ServiceWebForumSlug,
   },
   {
     id: 10,
-    slug: 'service_store_crown',
+    slug: ServiceStoreCrownSlug,
   },
   {
     id: 11,
-    slug: 'service_store_eso',
+    slug: ServiceStoreEsoSlug,
   },
   {
     id: 12,
-    slug: 'service_system_account',
+    slug: ServiceSystemAccountSlug,
   },
 ];
