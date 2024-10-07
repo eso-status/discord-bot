@@ -1,8 +1,7 @@
 import { InjectDiscordClient } from '@discord-nestjs/core';
 import { EsoStatusConnector } from '@eso-status/connector';
-import {
+import EsoStatus, {
   DownStatus,
-  EsoStatus,
   EsoStatusMaintenance,
   EsoStatusRawData,
   IssuesStatus,
