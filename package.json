@@ -1,6 +1,6 @@
 {
   "name": "@eso-status/discord-bot",
-  "version": "1.0.0-dev.13",
+  "version": "1.0.0-dev.14",
   "description": "Eso-status discord bot",
   "author": "@dov118 <contact@dov118.dev> (https://dov118.dev)",
   "private": false,
