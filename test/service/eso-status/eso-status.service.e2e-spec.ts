@@ -3,8 +3,7 @@ import * as EventEmitter from 'events';
 import { EventType } from '@discord-nestjs/core/dist/definitions/types/event.type';
 import { ClientService } from '@discord-nestjs/core/dist/services/client.service';
 import { EsoStatusConnector } from '@eso-status/connector';
-import {
-  EsoStatus,
+import EsoStatus, {
   EsoStatusMaintenance,
   EuZone,
   NaZone,
@@ -24,7 +23,6 @@ import { NestFactory } from '@nestjs/core';
 import { Client, Embed, Message } from 'discord.js';
 
 import { config } from 'dotenv';
-import * as moment from 'moment/moment';
 import { Repository } from 'typeorm';
 import { runSeeders } from 'typeorm-extension';
 
@@ -195,30 +193,10 @@ describe('EsoStatusService (e2e)', (): void => {
             rawSlug: 'PTS',
             rawStatus: 'We will be performing maintenance',
             rawDate: 'Wednesday at 9:00AM EDT (13:00 UTC)',
-            dates: [
-              moment()
-                .utc()
-                .set('years', 2024)
-                .set('months', 9 - 1)
-                .set('date', 11)
-                .set('hours', 13)
-                .set('minutes', 0)
-                .set('seconds', 0)
-                .set('milliseconds', 0)
-                .utcOffset(0),
-            ],
+            dates: ['2024-09-11T13:00:00.000Z'],
           },
         ],
-        beginnerAt: moment()
-          .utc()
-          .set('years', 2024)
-          .set('months', 9 - 1)
-          .set('date', 11)
-          .set('hours', 13)
-          .set('minutes', 0)
-          .set('seconds', 0)
-          .set('milliseconds', 0)
-          .utcOffset(0),
+        beginnerAt: '2024-09-11T13:00:00.000Z',
       },
     },
     {
@@ -248,28 +226,7 @@ describe('EsoStatusService (e2e)', (): void => {
             rawSlug: 'PC/Mac: NA and EU megaservers for',
             rawDate:
               'August 19, 4:00AM EDT (8:00 UTC) - 10:00AM EDT (14:00 UTC)',
-            dates: [
-              moment()
-                .utc()
-                .set('years', 2024)
-                .set('months', 8 - 1)
-                .set('date', 19)
-                .set('hours', 8)
-                .set('minutes', 0)
-                .set('seconds', 0)
-                .set('milliseconds', 0)
-                .utcOffset(0),
-              moment()
-                .utc()
-                .set('years', 2024)
-                .set('months', 8 - 1)
-                .set('date', 19)
-                .set('hours', 14)
-                .set('minutes', 0)
-                .set('seconds', 0)
-                .set('milliseconds', 0)
-                .utcOffset(0),
-            ],
+            dates: ['2024-08-19T08:00:00.000Z', '2024-08-19T14:00:00.000Z'],
           },
           {
             source: 'https://forums.elderscrollsonline.com',
@@ -282,52 +239,11 @@ describe('EsoStatusService (e2e)', (): void => {
             rawSlug: 'PC/Mac: NA and EU megaservers for',
             rawDate:
               'August 19, 4:00AM EDT (8:00 UTC) - 10:00AM EDT (14:00 UTC)',
-            dates: [
-              moment()
-                .utc()
-                .set('years', 2024)
-                .set('months', 8 - 1)
-                .set('date', 19)
-                .set('hours', 8)
-                .set('minutes', 0)
-                .set('seconds', 0)
-                .set('milliseconds', 0)
-                .utcOffset(0),
-              moment()
-                .utc()
-                .set('years', 2024)
-                .set('months', 8 - 1)
-                .set('date', 19)
-                .set('hours', 14)
-                .set('minutes', 0)
-                .set('seconds', 0)
-                .set('milliseconds', 0)
-                .utcOffset(0),
-            ],
+            dates: ['2024-08-19T08:00:00.000Z', '2024-08-19T14:00:00.000Z'],
           },
         ],
-        beginnerAt: moment()
-          .utc()
-          .set('years', 2024)
-          .set('months', 8 - 1)
-          .set('date', 19)
-          .set('hours', 8)
-          .set('minutes', 0)
-          .set('seconds', 0)
-          .set('milliseconds', 0)
-          .utcOffset(0)
-          .toISOString(),
-        endingAt: moment()
-          .utc()
-          .set('years', 2024)
-          .set('months', 8 - 1)
-          .set('date', 19)
-          .set('hours', 14)
-          .set('minutes', 0)
-          .set('seconds', 0)
-          .set('milliseconds', 0)
-          .utcOffset(0)
-          .toISOString(),
+        beginnerAt: '2024-08-19T08:00:00.000Z',
+        endingAt: '2024-08-19T14:00:00.000Z',
       },
     },
     {
