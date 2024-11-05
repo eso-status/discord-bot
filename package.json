@@ -36,7 +36,7 @@
   "dependencies": {
     "@discord-nestjs/common": "5.2.12",
     "@discord-nestjs/core": "5.3.14",
-    "@eso-status/connector": "3.0.0-dev.1",
+    "@eso-status/connector": "3.0.0-dev.2",
     "@eso-status/types": "2.0.0-dev.13",
     "@nestjs/cli": "10.4.5",
     "@nestjs/common": "10.4.4",
