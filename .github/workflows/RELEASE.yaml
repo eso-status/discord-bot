@@ -14,13 +14,13 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Récupération du code
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4.0.3
+      - uses: actions/setup-node@v4.2.0
         with:
-          node-version: 20.17.0
+          node-version: 22.13.1
 
       - name: Get version
         id: get_version
@@ -29,7 +29,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4.0.2
+        uses: aws-actions/configure-aws-credentials@v4.1.0
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -52,7 +52,7 @@ jobs:
           image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.DOCKER_HUB_NAME }}/${{ secrets.DOCKER_HUB_REGISTRY }}:${{ steps.get_version.outputs.version }}
 
       - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2.0.0
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2.3.0
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ${{ secrets.ECS_SERVICE }}

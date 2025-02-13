@@ -63,7 +63,7 @@ export class EsoStatusService {
       .setDescription(message)
       .setTimestamp()
       .setFooter({
-        text: 'Data from https://preprod.api.eso-status.com/v3/service',
+        text: 'Data from https://api.eso-status.com/v3/service',
         iconURL: 'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
       });
   }
@@ -108,7 +108,7 @@ export class EsoStatusService {
       )
       .setTimestamp()
       .setFooter({
-        text: 'Data from https://preprod.api.eso-status.com/v3/service',
+        text: 'Data from https://api.eso-status.com/v3/service',
         iconURL: 'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
       });
   }
@@ -122,7 +122,7 @@ export class EsoStatusService {
       )
       .setTimestamp()
       .setFooter({
-        text: 'Data from https://preprod.api.eso-status.com/v3/service',
+        text: 'Data from https://api.eso-status.com/v3/service',
         iconURL: 'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
       });
   }

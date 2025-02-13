@@ -38,7 +38,7 @@ services:
       retries: 30
   pma_discord_bot_eso_status:
     container_name: pma_discord_bot_eso_status
-    image: phpmyadmin:5.2.1
+    image: phpmyadmin:5.2.2
     env_file: .env
     depends_on:
      mysql_discord_bot_eso_status:
