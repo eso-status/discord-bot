@@ -12,7 +12,8 @@ docker login harbor.kevin-c.fr
 ```bash
 docker buildx build \
   --platform linux/amd64 \
-  -t harbor.kevin-c.fr/library/eso_status_discord_bot:0.0.1 \
+  -t harbor.kevin-c.fr/library/eso_status_discord_bot:0.0.3 \
+  --no-cache \
   --push .
 ```
 ou
