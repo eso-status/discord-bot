@@ -3,19 +3,10 @@ import * as EventEmitter from 'events';
 import { EventType } from '@discord-nestjs/core/dist/definitions/types/event.type';
 import { ClientService } from '@discord-nestjs/core/dist/services/client.service';
 import { EsoStatusConnector } from '@eso-status/connector';
-import EsoStatus, {
-  EsoStatusMaintenance,
-  EuZone,
-  NaZone,
-  PcSupport,
-  PlannedStatus,
-  PtsZone,
-  ServerPcEuSlug,
-  ServerPcNaSlug,
-  ServerPcPtsSlug,
-  ServerType,
+import {
+  EsoStatus,
+  MaintenanceEsoStatus,
   Slug as EsoStatusSlug,
-  UpStatus,
 } from '@eso-status/types';
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -23,6 +14,7 @@ import { NestFactory } from '@nestjs/core';
 import { Client, Embed, Message } from 'discord.js';
 
 import { config } from 'dotenv';
+import * as moment from 'moment/moment';
 import { Repository } from 'typeorm';
 import { runSeeders } from 'typeorm-extension';
 
@@ -50,7 +42,7 @@ const testEsoStatusEvent = (
   resolve: (value?: void | PromiseLike<void>) => void,
   event: EventType,
   message: Embed,
-  data?: EsoStatus | EsoStatusMaintenance | EsoStatusSlug,
+  data?: EsoStatus | MaintenanceEsoStatus | EsoStatusSlug,
 ): void => {
   const method: SpyInstance<Promise<void>> = jest.spyOn(
     app.get(EsoStatusService),
@@ -164,7 +156,7 @@ describe('EsoStatusService (e2e)', (): void => {
     {
       event: EventType;
       message?: Embed;
-      data?: EsoStatus | EsoStatusMaintenance | EsoStatusSlug;
+      data?: EsoStatus | MaintenanceEsoStatus | EsoStatusSlug;
     }[]
   >[
     {
@@ -172,78 +164,73 @@ describe('EsoStatusService (e2e)', (): void => {
       message: {
         data: {
           title: 'New maintenance planned!',
-          description: '**PC-PTS** => Wednesday September 11, 2024 from 13:00',
-          footer: {
-            text: 'Data from https://preprod.api.eso-status.com/v3/service',
-            icon_url:
-              'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
-          },
-        },
-      },
-      data: {
-        rawDataList: [
-          {
-            source: 'https://forums.elderscrollsonline.com/en/categories/pts',
-            raw: 'We will be performing maintenance on the PTS on Wednesday at 9:00AM EDT (13:00 UTC). <a href="https://forums.elderscrollsonline.com/en/discussion/665349" rel="nofollow">https://forums.elderscrollsonline.com/en/discussion/665349</a>',
-            slug: ServerPcPtsSlug,
-            type: ServerType,
-            support: PcSupport,
-            zone: PtsZone,
-            status: PlannedStatus,
-            rawSlug: 'PTS',
-            rawStatus: 'We will be performing maintenance',
-            rawDate: 'Wednesday at 9:00AM EDT (13:00 UTC)',
-            dates: ['2024-09-11T13:00:00.000Z'],
-          },
-        ],
-        beginnerAt: '2024-09-11T13:00:00.000Z',
-      },
-    },
-    {
-      event: 'maintenancePlanned',
-      message: {
-        data: {
-          title: 'New maintenance planned!',
           description:
-            '**PC-EU** - **PC-NA** => Monday August 19, 2024 from 8:00 to 14:00',
+            '• PC/Mac: NA and EU megaservers for patch maintenance – July 29, 4:00AM EDT (8:00 UTC) – 8:00AM EDT (12:00 UTC)',
           footer: {
-            text: 'Data from https://preprod.api.eso-status.com/v3/service',
+            text: 'Data from https://api.eso-status.com/v2/service',
             icon_url:
               'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
           },
         },
       },
       data: {
-        rawDataList: [
-          {
-            source: 'https://forums.elderscrollsonline.com',
-            raw: '• PC/Mac: NA and EU megaservers for patch maintenance – August 19, 4:00AM EDT (8:00 UTC) - 10:00AM EDT (14:00 UTC)',
-            slug: ServerPcEuSlug,
-            type: ServerType,
-            support: PcSupport,
-            zone: EuZone,
-            status: PlannedStatus,
-            rawSlug: 'PC/Mac: NA and EU megaservers for',
-            rawDate:
-              'August 19, 4:00AM EDT (8:00 UTC) - 10:00AM EDT (14:00 UTC)',
-            dates: ['2024-08-19T08:00:00.000Z', '2024-08-19T14:00:00.000Z'],
-          },
-          {
-            source: 'https://forums.elderscrollsonline.com',
-            raw: '• PC/Mac: NA and EU megaservers for patch maintenance – August 19, 4:00AM EDT (8:00 UTC) - 10:00AM EDT (14:00 UTC)',
-            slug: ServerPcNaSlug,
-            type: ServerType,
-            support: PcSupport,
-            zone: NaZone,
-            status: PlannedStatus,
-            rawSlug: 'PC/Mac: NA and EU megaservers for',
-            rawDate:
-              'August 19, 4:00AM EDT (8:00 UTC) - 10:00AM EDT (14:00 UTC)',
-            dates: ['2024-08-19T08:00:00.000Z', '2024-08-19T14:00:00.000Z'],
-          },
-        ],
-        beginnerAt: '2024-08-19T08:00:00.000Z',
-        endingAt: '2024-08-19T14:00:00.000Z',
+        raw: {
+          sources: ['https://forums.elderscrollsonline.com/'],
+          raw: [
+            '• PC/Mac: NA and EU megaservers for patch maintenance – July 29, 4:00AM EDT (8:00 UTC) – 8:00AM EDT (12:00 UTC)',
+          ],
+          slugs: ['server_pc_na'],
+          rawDate: 'July 29, 4:00AM EDT (8:00 UTC) – 8:00AM EDT (12:00 UTC)',
+          dates: [
+            moment()
+              .utc()
+              .set('years', 2024)
+              .set('months', 7)
+              .set('date', 29)
+              .set('hours', 8)
+              .set('minutes', 0)
+              .set('seconds', 0)
+              .set('milliseconds', 0)
+              .utcOffset(0),
+            moment()
+              .utc()
+              .set('years', 2024)
+              .set('months', 7)
+              .set('date', 29)
+              .set('hours', 12)
+              .set('minutes', 0)
+              .set('seconds', 0)
+              .set('milliseconds', 0)
+              .utcOffset(0),
+          ],
+          type: 'server',
+          support: 'pc',
+          zone: 'na',
+          status: 'planned',
+        },
+        slug: 'server_pc_na',
+        beginnerAt: moment()
+          .utc()
+          .set('years', 2024)
+          .set('months', 7)
+          .set('date', 29)
+          .set('hours', 8)
+          .set('minutes', 0)
+          .set('seconds', 0)
+          .set('milliseconds', 0)
+          .utcOffset(0)
+          .toISOString(),
+        endingAt: moment()
+          .utc()
+          .set('years', 2024)
+          .set('months', 7)
+          .set('date', 29)
+          .set('hours', 12)
+          .set('minutes', 0)
+          .set('seconds', 0)
+          .set('milliseconds', 0)
+          .utcOffset(0)
+          .toISOString(),
       },
     },
     {
@@ -253,28 +240,29 @@ describe('EsoStatusService (e2e)', (): void => {
           title: 'Eso Status service status changed!',
           description: '**PC-EU** => :white_check_mark:',
           footer: {
-            text: 'Data from https://preprod.api.eso-status.com/v3/service',
+            text: 'Data from https://api.eso-status.com/v2/service',
             icon_url:
               'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
           },
         },
       },
       data: {
-        slug: ServerPcEuSlug,
-        status: UpStatus,
-        type: ServerType,
-        support: PcSupport,
-        zone: EuZone,
+        slug: 'server_pc_eu',
+        status: 'up',
+        type: 'server',
+        support: 'pc',
+        zone: 'eu',
         raw: {
-          source: 'https://live-services.elderscrollsonline.com/status/realms',
-          raw: '"The Elder Scrolls Online (EU)":"UP"',
-          slug: ServerPcEuSlug,
-          type: ServerType,
-          support: PcSupport,
-          zone: EuZone,
-          status: UpStatus,
+          sources: [
+            'https://live-services.elderscrollsonline.com/status/realms',
+          ],
+          raw: ['The Elder Scrolls Online (EU)', 'UP'],
           rawSlug: 'The Elder Scrolls Online (EU)',
           rawStatus: 'UP',
+          slugs: ['server_pc_eu'],
+          support: 'pc',
+          zone: 'eu',
+          status: 'up',
         },
       },
     },
@@ -284,7 +272,7 @@ describe('EsoStatusService (e2e)', (): void => {
         data: {
           description: 'Eso status API disconnected!',
           footer: {
-            text: 'Data from https://preprod.api.eso-status.com/v3/service',
+            text: 'Data from https://api.eso-status.com/v2/service',
             icon_url:
               'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
           },
@@ -297,7 +285,7 @@ describe('EsoStatusService (e2e)', (): void => {
         data: {
           description: 'Eso status API reconnected!',
           footer: {
-            text: 'Data from https://preprod.api.eso-status.com/v3/service',
+            text: 'Data from https://api.eso-status.com/v2/service',
             icon_url:
               'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
           },
@@ -310,7 +298,7 @@ describe('EsoStatusService (e2e)', (): void => {
         data: {
           description: 'Eso status API connected!',
           footer: {
-            text: 'Data from https://preprod.api.eso-status.com/v3/service',
+            text: 'Data from https://api.eso-status.com/v2/service',
             icon_url:
               'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
           },
@@ -322,7 +310,7 @@ describe('EsoStatusService (e2e)', (): void => {
     async (event: {
       event: EventType;
       message?: Embed;
-      data?: EsoStatus | EsoStatusMaintenance | EsoStatusSlug;
+      data?: EsoStatus | MaintenanceEsoStatus | EsoStatusSlug;
     }): Promise<void> => {
       await new Promise<void>(
         (resolve: (value?: void | PromiseLike<void>) => void): void => {

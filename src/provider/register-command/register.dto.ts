@@ -1,19 +1,4 @@
 import { Choice, Param, ParamType } from '@discord-nestjs/core';
-import {
-  ServerPcEuSlug,
-  ServerPcNaSlug,
-  ServerPcPtsSlug,
-  ServerPsEuSlug,
-  ServerPsNaSlug,
-  ServerXboxEuSlug,
-  ServerXboxNaSlug,
-  ServiceStoreCrownSlug,
-  ServiceStoreEsoSlug,
-  ServiceSystemAccountSlug,
-  ServiceWebForumSlug,
-  ServiceWebSiteSlug,
-  Slug as SlugEsoStatus,
-} from '@eso-status/types';
 
 enum Event {
   maintenancePlanned = 'maintenancePlanned',
@@ -22,20 +7,20 @@ enum Event {
   reconnect = 'reconnect',
 }
 
-const Slug: Record<string, string> = {
-  ServerXboxNaSlug,
-  ServerXboxEuSlug,
-  ServerPsNaSlug,
-  ServerPsEuSlug,
-  ServerPcNaSlug,
-  ServerPcEuSlug,
-  ServerPcPtsSlug,
-  ServiceWebSiteSlug,
-  ServiceWebForumSlug,
-  ServiceStoreCrownSlug,
-  ServiceStoreEsoSlug,
-  ServiceSystemAccountSlug,
-};
+enum Slug {
+  server_xbox_na = 'server_xbox_na',
+  server_xbox_eu = 'server_xbox_eu',
+  server_ps_na = 'server_ps_na',
+  server_ps_eu = 'server_ps_eu',
+  server_pc_na = 'server_pc_na',
+  server_pc_eu = 'server_pc_eu',
+  server_pc_pts = 'server_pc_pts',
+  service_web_site = 'service_web_site',
+  service_web_forum = 'service_web_forum',
+  service_store_crown = 'service_store_crown',
+  service_store_eso = 'service_store_eso',
+  service_system_account = 'service_system_account',
+}
 
 export class RegisterDto {
   @Choice(Event)
@@ -52,5 +37,5 @@ export class RegisterDto {
     description: 'EsoStatus slug',
     type: ParamType.STRING,
   })
-  public slug: SlugEsoStatus = <SlugEsoStatus>'all';
+  public slug: Slug = <Slug>'all';
 }
