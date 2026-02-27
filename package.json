@@ -2,7 +2,7 @@
   "name": "@eso-status/discord-bot",
   "version": "1.0.0-dev.18",
   "description": "Eso-status discord bot",
-  "author": "@dov118 <contact@dov118.dev> (https://dov118.dev)",
+  "author": "@dov118 <contact.dov118.dev@gmail.com> (https://dov118.dev)",
   "private": false,
   "license": "MIT",
   "engineStrict": true,

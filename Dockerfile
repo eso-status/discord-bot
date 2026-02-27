@@ -1,5 +1,11 @@
 FROM node:22.13.1-alpine3.21
 
+RUN apk add --no-cache tzdata \
+    && ln -snf /usr/share/zoneinfo/Europe/Paris /etc/localtime \
+    && echo Europe/Paris > /etc/timezone
+
+ENV TZ=Europe/Paris
+
 WORKDIR /eso-status
 
 COPY ./dist/ ./dist/
