@@ -28,36 +28,22 @@ jobs:
           VERSION=`node -p "require('./package.json').version"`
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4.0.2
+      - name: Setup de kubectl
+        uses: azure/setup-kubectl@v4.0.1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          version: 'v1.34.4'
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2.0.1
-
-      - name: Get Amazon ECS task definition
+      - name: Setup de la configuration de K3s
+        env:
+          KUBE_CONFIG_B64: ${{ secrets.KUBE_CONFIG }}
         run: |
-          aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }} --query taskDefinition > task-definition.json
+          echo "$KUBE_CONFIG_B64" | base64 -d > /tmp/kubeconfig.yaml
 
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1.5.0
-        with:
-          task-definition: "task-definition.json"
-          container-name: ${{ secrets.DOCKER_HUB_REGISTRY }}
-          image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.DOCKER_HUB_NAME }}/${{ secrets.DOCKER_HUB_REGISTRY }}:${{ steps.get_version.outputs.version }}
+      - name: Fill in the new image ID in the k3s deployment
+        run: kubectl --kubeconfig=/tmp/kubeconfig.yaml --insecure-skip-tls-verify set image deployment/${{ secrets.KUBE_DEPLOYMENT }} ${{ secrets.HARBOR_CONTAINER }}=${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}/${{ secrets.HARBOR_REPOSITORY }}:${{ steps.get_version.outputs.version }} -n ${{ secrets.KUBE_NAMESPACE }}
 
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2.0.0
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ secrets.ECS_SERVICE }}
-          cluster: ${{ secrets.ECS_CLUSTER }}
-          wait-for-service-stability: true
+      - name: Deploy k3s deployment
+        run: kubectl --kubeconfig=/tmp/kubeconfig.yaml --insecure-skip-tls-verify rollout status deployment/${{ secrets.KUBE_DEPLOYMENT }} -n ${{ secrets.KUBE_NAMESPACE }} --timeout=60s
 
       - name: Create release
         env:
