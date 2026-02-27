@@ -1,10 +1,4 @@
-import {
-  DownStatus,
-  IssuesStatus,
-  PlannedStatus,
-  Status,
-  UpStatus,
-} from '@eso-status/types';
+import { Status } from '@eso-status/types';
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
@@ -27,10 +21,11 @@ describe('EsoStatusService', (): void => {
   }, 15000);
 
   it.each(<{ status: Status; icon: string }[]>[
-    { status: PlannedStatus, icon: ':date:' },
-    { status: DownStatus, icon: ':x:' },
-    { status: UpStatus, icon: ':white_check_mark:' },
-    { status: IssuesStatus, icon: ':wrench:' },
+    { status: 'planned', icon: ':date:' },
+    { status: 'down', icon: ':x:' },
+    { status: 'up', icon: ':white_check_mark:' },
+    { status: 'issues', icon: ':wrench:' },
+    { status: '', icon: '' },
   ])(
     'should esoStatus connector event listen',
     (statusIcon: { status: Status; icon: string }): void => {
