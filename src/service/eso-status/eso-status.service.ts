@@ -32,10 +32,10 @@ export class EsoStatusService {
     this.client.on('ready', (): void => {
       esoStatusEventEmitter = EsoStatusConnector.listen();
       esoStatusEventEmitter.emit = (function replaceEmit(
-        original: any,
+        original,
         customEventEmitter: EventEmitter2,
       ) {
-        return function emit(name: EventType, callback: any): any {
+        return function emit(name: EventType, callback) {
           customEventEmitter.emit(`esoStatus.${name}`, callback);
           return original(name, callback);
         };
