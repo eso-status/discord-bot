@@ -36,4 +36,5 @@ import { EsoStatusService } from './service/eso-status/eso-status.service';
     EsoStatusService,
   ],
 })
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class AppModule {}

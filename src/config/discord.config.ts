@@ -5,7 +5,7 @@ import {
 import { GatewayIntentBits } from 'discord.js';
 import { config } from 'dotenv';
 
-config();
+config({ quiet: true });
 
 const discordConfig: DiscordModuleAsyncOptions = {
   useFactory: (): DiscordModuleOption => ({

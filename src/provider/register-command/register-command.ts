@@ -56,7 +56,7 @@ export class RegisterCommand {
     const channel: TextChannel = this.client.channels.cache.get(
       interaction.channelId,
     ) as TextChannel;
-    await channel?.send({
+    await channel.send({
       embeds: [
         this.generateEmbed(
           await this.doOnRegister(
@@ -78,7 +78,7 @@ export class RegisterCommand {
       .setDescription(message)
       .setTimestamp()
       .setFooter({
-        text: 'Data from https://api.eso-status.com/v2/service',
+        text: 'Data from https://preprod.api.eso-status.com/v3/service',
         iconURL: 'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
       });
   }
@@ -90,23 +90,20 @@ export class RegisterCommand {
     slug: EsoStatusSlug,
   ): Promise<string> {
     const eventList: Event[] =
-      event === <EventType>'all'
+      event === ('all' as EventType)
         ? await this.eventService.getAll()
         : [await this.eventService.getByEvent(event)];
     const slugList: Slug[] =
-      slug === <EsoStatusSlug>'all'
+      slug === ('all' as EsoStatusSlug)
         ? await this.slugService.getAll()
         : [await this.slugService.getBySlug(slug)];
 
-    let server: Server = await this.serverService.getByServerId(guildId);
-    if (!server) {
-      server = await this.serverService.add(guildId);
-    }
+    let server: Server | null = await this.serverService.getByServerId(guildId);
+    server ??= await this.serverService.add(guildId);
 
-    let channel: Channel = await this.channelService.getByChannelId(channelId);
-    if (!channel) {
-      channel = await this.channelService.add(channelId, server.id);
-    }
+    let channel: Channel | null =
+      await this.channelService.getByChannelId(channelId);
+    channel ??= await this.channelService.add(channelId, server.id);
 
     await this.subscriptionService.deleteByChannelId(channel.id);
 

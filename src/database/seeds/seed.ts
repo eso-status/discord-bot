@@ -10,6 +10,6 @@ dataSource
     await runSeeders(dataSource);
     process.exit();
   })
-  .catch((error: Error): void => {
+  .catch((error: unknown): void => {
     throw error;
   });

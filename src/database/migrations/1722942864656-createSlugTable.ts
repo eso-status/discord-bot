@@ -5,7 +5,7 @@ import { runSeeder } from 'typeorm-extension';
 import { dataSource } from '../../config/typeorm.config';
 import { SlugSeeder } from '../seeds/slug.seeder';
 
-config();
+config({ quiet: true });
 
 export class CreateSlugTable1722942864656 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
