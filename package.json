@@ -27,7 +27,6 @@
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "lint:fix": "eslint \"{src,test}/**/*.ts\" --fix",
     "test": "jest --runInBand --detectOpenHandles --forceExit",
-    "test:watch": "jest --runInBand --watch",
     "test:cov": "jest --runInBand --coverage --detectOpenHandles --forceExit",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --runInBand --config ./test/jest-e2e.json",
@@ -110,5 +109,22 @@
     "modulePaths": [
       "<rootDir>"
     ]
+  },
+  "overrides": {
+    "@tootallnate/once": "3.0.1",
+    "tar": "7.5.11",
+    "undici": "6.23.0",
+    "ajv": "6.14.0",
+    "sqlite3": "5.1.7",
+    "file-type": "21.3.1",
+    "ajv-formats": {
+      "ajv": "8.18.0"
+    },
+    "@angular-devkit/core": {
+      "ajv": "8.18.0",
+      "ajv-formats": {
+        "ajv": "8.18.0"
+      }
+    }
   }
 }

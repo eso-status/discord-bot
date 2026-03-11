@@ -1,4 +1,4 @@
-FROM node:20.17.0-alpine3.20
+FROM node:24.14.0-alpine3.23
 
 RUN apk add --no-cache tzdata \
     && ln -snf /usr/share/zoneinfo/Europe/Paris /etc/localtime \
