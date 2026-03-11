@@ -1,6 +1,6 @@
 import { EventType } from '@discord-nestjs/core/dist/definitions/types/event.type';
 import { ClientService } from '@discord-nestjs/core/dist/services/client.service';
-import { Slug as EsoStatusSlug } from '@eso-status/types';
+import { ServerPcEuSlug, Slug as EsoStatusSlug } from '@eso-status/types';
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
@@ -29,7 +29,7 @@ import { RegisterCommand } from '../../../src/provider/register-command/register
 
 import SpyInstance = jest.SpyInstance;
 
-config();
+config({ quiet: true });
 
 const testCommand = (
   client: Client,
@@ -39,7 +39,7 @@ const testCommand = (
   guildId: string,
   channelId: string,
   event: EventType = 'all',
-  slug: EsoStatusSlug = <EsoStatusSlug>'all',
+  slug: EsoStatusSlug = 'all' as EsoStatusSlug,
 ): void => {
   const commandInteractionOptionList: CommandInteractionOption[] = [];
   let commandInteractionOptionEvent: CommandInteractionOption;
@@ -48,18 +48,18 @@ const testCommand = (
     commandInteractionOptionEvent = { name: 'event', type: 3, value: event };
     commandInteractionOptionList.push(commandInteractionOptionEvent);
   }
-  if (slug !== <EsoStatusSlug>'all') {
+  if (slug !== ('all' as EsoStatusSlug)) {
     commandInteractionOptionSlug = { name: 'slug', type: 3, value: slug };
     commandInteractionOptionList.push(commandInteractionOptionSlug);
   }
 
-  let dataOk: boolean = false;
+  let dataOk = false;
 
   client.on('messageCreate', (messageData: Message): void => {
     if (
       messageData.embeds[0].data.description === 'Successfully registered!' &&
       messageData.embeds[0].data.footer.text ===
-        'Data from https://api.eso-status.com/v2/service' &&
+        'Data from https://preprod.api.eso-status.com/v3/service' &&
       messageData.embeds[0].data.footer.icon_url ===
         'https://avatars.githubusercontent.com/u/87777413?s=200&v=4'
     ) {
@@ -68,7 +68,7 @@ const testCommand = (
   });
 
   // @ts-expect-error Necessary to emulate Interaction
-  client.emit('interactionCreate', <CommandInteraction>{
+  client.emit('interactionCreate', {
     isChatInputCommand: (): boolean => true,
     channelId,
     guildId,
@@ -76,18 +76,18 @@ const testCommand = (
     options: {
       _hoistedOptions: commandInteractionOptionList,
       get: (name: string): CommandInteractionOption | null => {
-        if (name === 'event' && event !== <EventType>'all') {
+        if (name === 'event' && event !== ('all' as EventType)) {
           return commandInteractionOptionEvent;
         }
 
-        if (name === 'slug' && slug !== <EsoStatusSlug>'all') {
+        if (name === 'slug' && slug !== ('all' as EsoStatusSlug)) {
           return commandInteractionOptionSlug;
         }
 
         return null;
       },
     },
-  });
+  } as CommandInteraction);
 
   setTimeout((): void => {
     if (dataOk) {
@@ -149,7 +149,7 @@ describe('RegisterCommand (e2e)', (): void => {
           serverId: process.env.DISCORD_TESTING_GUILDID,
         },
       }),
-    ).toEqual(0);
+    ).toBe(0);
 
     expect(
       await channelRepository.count({
@@ -157,7 +157,7 @@ describe('RegisterCommand (e2e)', (): void => {
           channelId: process.env.DISCORD_TESTING_CHANNELID,
         },
       }),
-    ).toEqual(0);
+    ).toBe(0);
 
     await new Promise<void>(
       (resolve: (value?: void | PromiseLike<void>) => void): void => {
@@ -170,7 +170,7 @@ describe('RegisterCommand (e2e)', (): void => {
             process.env.DISCORD_TESTING_GUILDID,
             process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
-            'server_pc_eu',
+            ServerPcEuSlug,
           );
         }
         client.on('ready', (): void => {
@@ -182,7 +182,7 @@ describe('RegisterCommand (e2e)', (): void => {
             process.env.DISCORD_TESTING_GUILDID,
             process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
-            'server_pc_eu',
+            ServerPcEuSlug,
           );
         });
       },
@@ -193,14 +193,14 @@ describe('RegisterCommand (e2e)', (): void => {
         serverId: process.env.DISCORD_TESTING_GUILDID,
       },
     });
-    expect(serverList.length).toEqual(1);
+    expect(serverList).toHaveLength(1);
 
     const channelList: Channel[] = await channelRepository.find({
       where: {
         channelId: process.env.DISCORD_TESTING_CHANNELID,
       },
     });
-    expect(channelList.length).toEqual(1);
+    expect(channelList).toHaveLength(1);
     expect(channelList[0].serverId).toEqual(serverList[0].id);
 
     const subscriptionList: Subscription[] = await subscriptionRepository.find({
@@ -208,9 +208,9 @@ describe('RegisterCommand (e2e)', (): void => {
         channelId: channelList[0].id,
       },
     });
-    expect(subscriptionList.length).toEqual(1);
-    expect(subscriptionList[0].eventId).toEqual(2);
-    expect(subscriptionList[0].slugId).toEqual(6);
+    expect(subscriptionList).toHaveLength(1);
+    expect(subscriptionList[0].eventId).toBe(2);
+    expect(subscriptionList[0].slugId).toBe(6);
     expect(subscriptionList[0].channelId).toEqual(channelList[0].id);
   }, 15000);
 
@@ -234,7 +234,7 @@ describe('RegisterCommand (e2e)', (): void => {
           serverId: process.env.DISCORD_TESTING_GUILDID,
         },
       }),
-    ).toEqual(1);
+    ).toBe(1);
 
     expect(
       await channelRepository.count({
@@ -242,7 +242,7 @@ describe('RegisterCommand (e2e)', (): void => {
           serverId: server.id,
         },
       }),
-    ).toEqual(1);
+    ).toBe(1);
 
     expect(
       await channelRepository.count({
@@ -250,7 +250,7 @@ describe('RegisterCommand (e2e)', (): void => {
           channelId: process.env.DISCORD_TESTING_CHANNELID,
         },
       }),
-    ).toEqual(0);
+    ).toBe(0);
 
     await new Promise<void>(
       (resolve: (value?: void | PromiseLike<void>) => void): void => {
@@ -263,7 +263,7 @@ describe('RegisterCommand (e2e)', (): void => {
             process.env.DISCORD_TESTING_GUILDID,
             process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
-            'server_pc_eu',
+            ServerPcEuSlug,
           );
         }
         client.on('ready', (): void => {
@@ -275,7 +275,7 @@ describe('RegisterCommand (e2e)', (): void => {
             process.env.DISCORD_TESTING_GUILDID,
             process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
-            'server_pc_eu',
+            ServerPcEuSlug,
           );
         });
       },
@@ -286,7 +286,7 @@ describe('RegisterCommand (e2e)', (): void => {
         serverId: process.env.DISCORD_TESTING_GUILDID,
       },
     });
-    expect(serverList.length).toEqual(1);
+    expect(serverList).toHaveLength(1);
 
     expect(
       await channelRepository.count({
@@ -294,14 +294,14 @@ describe('RegisterCommand (e2e)', (): void => {
           serverId: server.id,
         },
       }),
-    ).toEqual(2);
+    ).toBe(2);
 
     const channelList: Channel[] = await channelRepository.find({
       where: {
         channelId: process.env.DISCORD_TESTING_CHANNELID,
       },
     });
-    expect(channelList.length).toEqual(1);
+    expect(channelList).toHaveLength(1);
     expect(channelList[0].serverId).toEqual(serverList[0].id);
 
     const subscriptionList: Subscription[] = await subscriptionRepository.find({
@@ -309,9 +309,9 @@ describe('RegisterCommand (e2e)', (): void => {
         channelId: channelList[0].id,
       },
     });
-    expect(subscriptionList.length).toEqual(1);
-    expect(subscriptionList[0].eventId).toEqual(2);
-    expect(subscriptionList[0].slugId).toEqual(6);
+    expect(subscriptionList).toHaveLength(1);
+    expect(subscriptionList[0].eventId).toBe(2);
+    expect(subscriptionList[0].slugId).toBe(6);
     expect(subscriptionList[0].channelId).toEqual(channelList[0].id);
   }, 15000);
 
@@ -335,7 +335,7 @@ describe('RegisterCommand (e2e)', (): void => {
           serverId: process.env.DISCORD_TESTING_GUILDID,
         },
       }),
-    ).toEqual(1);
+    ).toBe(1);
 
     expect(
       await channelRepository.count({
@@ -343,7 +343,7 @@ describe('RegisterCommand (e2e)', (): void => {
           serverId: server.id,
         },
       }),
-    ).toEqual(1);
+    ).toBe(1);
 
     expect(
       await channelRepository.count({
@@ -351,7 +351,7 @@ describe('RegisterCommand (e2e)', (): void => {
           channelId: process.env.DISCORD_TESTING_CHANNELID,
         },
       }),
-    ).toEqual(1);
+    ).toBe(1);
 
     await Promise.all(
       [
@@ -379,7 +379,7 @@ describe('RegisterCommand (e2e)', (): void => {
           channelId: channel.id,
         },
       }),
-    ).toEqual(2);
+    ).toBe(2);
 
     await new Promise<void>(
       (resolve: (value?: void | PromiseLike<void>) => void): void => {
@@ -392,7 +392,7 @@ describe('RegisterCommand (e2e)', (): void => {
             process.env.DISCORD_TESTING_GUILDID,
             process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
-            'server_pc_eu',
+            ServerPcEuSlug,
           );
         }
         client.on('ready', (): void => {
@@ -404,7 +404,7 @@ describe('RegisterCommand (e2e)', (): void => {
             process.env.DISCORD_TESTING_GUILDID,
             process.env.DISCORD_TESTING_CHANNELID,
             'statusUpdate',
-            'server_pc_eu',
+            ServerPcEuSlug,
           );
         });
       },
@@ -415,7 +415,7 @@ describe('RegisterCommand (e2e)', (): void => {
         serverId: process.env.DISCORD_TESTING_GUILDID,
       },
     });
-    expect(serverList.length).toEqual(1);
+    expect(serverList).toHaveLength(1);
 
     expect(
       await channelRepository.count({
@@ -423,14 +423,14 @@ describe('RegisterCommand (e2e)', (): void => {
           serverId: server.id,
         },
       }),
-    ).toEqual(1);
+    ).toBe(1);
 
     const channelList: Channel[] = await channelRepository.find({
       where: {
         channelId: process.env.DISCORD_TESTING_CHANNELID,
       },
     });
-    expect(channelList.length).toEqual(1);
+    expect(channelList).toHaveLength(1);
     expect(channelList[0].serverId).toEqual(serverList[0].id);
 
     const subscriptionList: Subscription[] = await subscriptionRepository.find({
@@ -438,9 +438,9 @@ describe('RegisterCommand (e2e)', (): void => {
         channelId: channelList[0].id,
       },
     });
-    expect(subscriptionList.length).toEqual(1);
-    expect(subscriptionList[0].eventId).toEqual(2);
-    expect(subscriptionList[0].slugId).toEqual(6);
+    expect(subscriptionList).toHaveLength(1);
+    expect(subscriptionList[0].eventId).toBe(2);
+    expect(subscriptionList[0].slugId).toBe(6);
     expect(subscriptionList[0].channelId).toEqual(channelList[0].id);
   }, 15000);
 
@@ -451,7 +451,7 @@ describe('RegisterCommand (e2e)', (): void => {
           serverId: process.env.DISCORD_TESTING_GUILDID,
         },
       }),
-    ).toEqual(0);
+    ).toBe(0);
 
     expect(
       await channelRepository.count({
@@ -459,7 +459,7 @@ describe('RegisterCommand (e2e)', (): void => {
           channelId: process.env.DISCORD_TESTING_CHANNELID,
         },
       }),
-    ).toEqual(0);
+    ).toBe(0);
 
     await new Promise<void>(
       (resolve: (value?: void | PromiseLike<void>) => void): void => {
@@ -493,14 +493,14 @@ describe('RegisterCommand (e2e)', (): void => {
         serverId: process.env.DISCORD_TESTING_GUILDID,
       },
     });
-    expect(serverList.length).toEqual(1);
+    expect(serverList).toHaveLength(1);
 
     const channelList: Channel[] = await channelRepository.find({
       where: {
         channelId: process.env.DISCORD_TESTING_CHANNELID,
       },
     });
-    expect(channelList.length).toEqual(1);
+    expect(channelList).toHaveLength(1);
     expect(channelList[0].serverId).toEqual(serverList[0].id);
 
     const subscriptionList: Subscription[] = await subscriptionRepository.find({
@@ -509,7 +509,7 @@ describe('RegisterCommand (e2e)', (): void => {
         channelId: channelList[0].id,
       },
     });
-    expect(subscriptionList.length).toEqual(slugData.length);
+    expect(subscriptionList).toHaveLength(slugData.length);
 
     const expectList: { eventId: number; slugId: number }[] = [];
     slugData.forEach((slug: Slug): void => {
@@ -532,7 +532,7 @@ describe('RegisterCommand (e2e)', (): void => {
           serverId: process.env.DISCORD_TESTING_GUILDID,
         },
       }),
-    ).toEqual(0);
+    ).toBe(0);
 
     expect(
       await channelRepository.count({
@@ -540,7 +540,7 @@ describe('RegisterCommand (e2e)', (): void => {
           channelId: process.env.DISCORD_TESTING_CHANNELID,
         },
       }),
-    ).toEqual(0);
+    ).toBe(0);
 
     await new Promise<void>(
       (resolve: (value?: void | PromiseLike<void>) => void): void => {
@@ -572,14 +572,14 @@ describe('RegisterCommand (e2e)', (): void => {
         serverId: process.env.DISCORD_TESTING_GUILDID,
       },
     });
-    expect(serverList.length).toEqual(1);
+    expect(serverList).toHaveLength(1);
 
     const channelList: Channel[] = await channelRepository.find({
       where: {
         channelId: process.env.DISCORD_TESTING_CHANNELID,
       },
     });
-    expect(channelList.length).toEqual(1);
+    expect(channelList).toHaveLength(1);
     expect(channelList[0].serverId).toEqual(serverList[0].id);
 
     const subscriptionList: Subscription[] = await subscriptionRepository.find({
@@ -588,7 +588,7 @@ describe('RegisterCommand (e2e)', (): void => {
         channelId: channelList[0].id,
       },
     });
-    expect(subscriptionList.length).toEqual(slugData.length * eventData.length);
+    expect(subscriptionList).toHaveLength(slugData.length * eventData.length);
 
     const expectList: { eventId: number; slugId: number }[] = [];
     slugData.forEach((slug: Slug): void => {

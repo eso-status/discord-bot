@@ -1,4 +1,10 @@
-import { Status } from '@eso-status/types';
+import {
+  DownStatus,
+  IssuesStatus,
+  PlannedStatus,
+  Status,
+  UpStatus,
+} from '@eso-status/types';
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
@@ -7,7 +13,7 @@ import { config } from 'dotenv';
 import { AppModule } from '../../../src/app.module';
 import { EsoStatusService } from '../../../src/service/eso-status/eso-status.service';
 
-config();
+config({ quiet: true });
 
 describe('EsoStatusService', (): void => {
   let app: INestApplication;
@@ -20,13 +26,12 @@ describe('EsoStatusService', (): void => {
     await app.close();
   }, 15000);
 
-  it.each(<{ status: Status; icon: string }[]>[
-    { status: 'planned', icon: ':date:' },
-    { status: 'down', icon: ':x:' },
-    { status: 'up', icon: ':white_check_mark:' },
-    { status: 'issues', icon: ':wrench:' },
-    { status: '', icon: '' },
-  ])(
+  it.each([
+    { status: PlannedStatus, icon: ':date:' },
+    { status: DownStatus, icon: ':x:' },
+    { status: UpStatus, icon: ':white_check_mark:' },
+    { status: IssuesStatus, icon: ':wrench:' },
+  ] as { status: Status; icon: string }[])(
     'should esoStatus connector event listen',
     (statusIcon: { status: Status; icon: string }): void => {
       const esoStatusService: EsoStatusService = app.get(EsoStatusService);

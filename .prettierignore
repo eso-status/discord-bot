@@ -1,4 +1,10 @@
+# compiled output
+/dist
+
+# Ignore artifacts:
 coverage
 node_modules
+
+# Ignore all HTML files:
 .gitignore
 .prettierignore

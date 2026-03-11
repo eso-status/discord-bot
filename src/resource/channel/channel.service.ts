@@ -14,7 +14,7 @@ export class ChannelService {
     private readonly channelRepository: Repository<Channel>,
   ) {}
 
-  public async getByChannelId(channelId: string): Promise<Channel> {
+  public async getByChannelId(channelId: string): Promise<Channel | null> {
     return this.channelRepository.findOne({
       relations: ['subscriptions'],
       where: {
