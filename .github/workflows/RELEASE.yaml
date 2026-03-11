@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [closed]
     branches:
-      - "main"
+      - 'preprod'
 
 jobs:
   release:
@@ -14,13 +14,13 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Récupération du code
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4.0.3
+      - uses: actions/setup-node@v6.3.0
         with:
-          node-version: 20.17.0
+          node-version: 24.14.0
 
       - name: Get version
         id: get_version
@@ -40,13 +40,13 @@ jobs:
           echo "$KUBE_CONFIG_B64" | base64 -d > /tmp/kubeconfig.yaml
 
       - name: Fill in the new image ID in the k3s deployment
-        run: kubectl --kubeconfig=/tmp/kubeconfig.yaml --insecure-skip-tls-verify set image deployment/${{ secrets.KUBE_DEPLOYMENT }} ${{ secrets.HARBOR_CONTAINER }}=${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}/${{ secrets.HARBOR_REPOSITORY }}:${{ steps.get_version.outputs.version }} -n ${{ secrets.KUBE_NAMESPACE }}
+        run: kubectl --kubeconfig=/tmp/kubeconfig.yaml --insecure-skip-tls-verify set image deployment/${{ secrets.KUBE_DEPLOYMENT_V3 }} ${{ secrets.HARBOR_CONTAINER_V3 }}=${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}/${{ secrets.HARBOR_REPOSITORY }}:${{ steps.get_version.outputs.version }} -n ${{ secrets.KUBE_NAMESPACE_V3 }}
 
       - name: Deploy k3s deployment
-        run: kubectl --kubeconfig=/tmp/kubeconfig.yaml --insecure-skip-tls-verify rollout status deployment/${{ secrets.KUBE_DEPLOYMENT }} -n ${{ secrets.KUBE_NAMESPACE }} --timeout=60s
+        run: kubectl --kubeconfig=/tmp/kubeconfig.yaml --insecure-skip-tls-verify rollout status deployment/${{ secrets.KUBE_DEPLOYMENT_V3 }} -n ${{ secrets.KUBE_NAMESPACE_V3 }} --timeout=60s
 
-      - name: Create release
-        env:
-          GH_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
-        run: |
-          gh release create ${{ steps.get_version.outputs.version }} --title "${{ steps.get_version.outputs.version }}" --generate-notes --latest
+#      - name: Create release
+#        env:
+#          GH_TOKEN: ${{ secrets.CUSTOM_TOKEN }}
+#        run: |
+#          gh release create ${{ steps.get_version.outputs.version }} --title "${{ steps.get_version.outputs.version }}" --generate-notes --latest

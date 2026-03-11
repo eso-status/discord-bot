@@ -5,7 +5,7 @@ import { dataSource } from '../../config/typeorm.config';
 import { Event } from '../../resource/event/entities/event.entity';
 import { eventData } from '../data/event.data';
 
-config();
+config({ quiet: true });
 
 const newEvent: Event = eventData[4];
 

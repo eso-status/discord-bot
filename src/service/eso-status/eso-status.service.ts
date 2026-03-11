@@ -1,10 +1,20 @@
 import { InjectDiscordClient } from '@discord-nestjs/core';
 import { EsoStatusConnector } from '@eso-status/connector';
-import { EsoStatus, MaintenanceEsoStatus, Status } from '@eso-status/types';
+import EsoStatus, {
+  DownStatus,
+  EsoStatusMaintenance,
+  EsoStatusRawData,
+  IssuesStatus,
+  PlannedStatus,
+  Status,
+  UpStatus,
+} from '@eso-status/types';
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 import { Client, EmbedBuilder, TextChannel } from 'discord.js';
+
+import * as moment from 'moment/moment';
 
 import { ChannelService } from '../../resource/channel/channel.service';
 import { Channel } from '../../resource/channel/entities/channel.entity';
@@ -13,7 +23,7 @@ import { EventType } from '../../type/event.type';
 @Injectable()
 export class EsoStatusService {
   constructor(
-    private eventEmitter: EventEmitter2,
+    private readonly eventEmitter: EventEmitter2,
     private readonly channelService: ChannelService,
     @InjectDiscordClient()
     private readonly client: Client,
@@ -53,36 +63,52 @@ export class EsoStatusService {
       .setDescription(message)
       .setTimestamp()
       .setFooter({
-        text: 'Data from https://api.eso-status.com/v2/service',
+        text: 'Data from https://preprod.api.eso-status.com/v3/service',
         iconURL: 'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
       });
   }
 
   public getIconByStatus(status: Status): string {
     switch (status) {
-      case 'planned':
+      case PlannedStatus:
         return ':date:';
-      case 'down':
+      case DownStatus:
         return ':x:';
-      case 'up':
+      case UpStatus:
         return ':white_check_mark:';
-      case 'issues':
-        return ':wrench:';
+      case IssuesStatus:
       default:
-        return '';
+        return ':wrench:';
     }
   }
 
+  public generateMaintenancePlannedDescription(
+    maintenanceEsoStatus: EsoStatusMaintenance,
+  ): string {
+    const ending: string = maintenanceEsoStatus.endingAt
+      ? ` to ${moment(maintenanceEsoStatus.endingAt).utcOffset(0).format('H:mm')}`
+      : '';
+    return `${maintenanceEsoStatus.rawDataList
+      .map((rawData: EsoStatusRawData): string => {
+        return `**${rawData.support.toUpperCase()}-${rawData.zone.toUpperCase()}**`;
+      })
+      .join(
+        ' - ',
+      )} => ${moment(maintenanceEsoStatus.beginnerAt).utcOffset(0).format('dddd MMMM DD, YYYY')} from ${moment(maintenanceEsoStatus.beginnerAt).utcOffset(0).format('H:mm')}${ending}`;
+  }
+
   public generateMaintenancePlannedEmbed(
-    maintenanceEsoStatus: MaintenanceEsoStatus,
+    maintenanceEsoStatus: EsoStatusMaintenance,
   ): EmbedBuilder {
     return new EmbedBuilder()
       .setColor('#0d1118')
       .setTitle(`New maintenance planned!`)
-      .setDescription(maintenanceEsoStatus.raw.raw[0])
+      .setDescription(
+        this.generateMaintenancePlannedDescription(maintenanceEsoStatus),
+      )
       .setTimestamp()
       .setFooter({
-        text: 'Data from https://api.eso-status.com/v2/service',
+        text: 'Data from https://preprod.api.eso-status.com/v3/service',
         iconURL: 'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
       });
   }
@@ -96,7 +122,7 @@ export class EsoStatusService {
       )
       .setTimestamp()
       .setFooter({
-        text: 'Data from https://api.eso-status.com/v2/service',
+        text: 'Data from https://preprod.api.eso-status.com/v3/service',
         iconURL: 'https://avatars.githubusercontent.com/u/87777413?s=200&v=4',
       });
   }
@@ -150,11 +176,11 @@ export class EsoStatusService {
   }
 
   @OnEvent('esoStatus.maintenancePlanned')
-  public async maintenancePlanned(maintenanceEsoStatus: MaintenanceEsoStatus) {
+  public async maintenancePlanned(maintenanceEsoStatus: EsoStatusMaintenance) {
     const channelList: Channel[] =
       await this.channelService.getBySubscriptionEventAndSlug(
         'maintenancePlanned',
-        maintenanceEsoStatus.slug,
+        maintenanceEsoStatus.rawDataList[0].slug,
       );
 
     await Promise.all(

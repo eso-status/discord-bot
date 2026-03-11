@@ -10,7 +10,7 @@ import { Server } from '../resource/server/entities/server.entity';
 import { Slug } from '../resource/slug/entities/slug.entity';
 import { Subscription } from '../resource/subscription/entities/subscription.entity';
 
-config();
+config({ quiet: true });
 
 const customDataSourceOptions: {
   mysql: DataSourceOptions & SeederOptions;
@@ -18,7 +18,7 @@ const customDataSourceOptions: {
 } = { mysql: null, sqlite: null };
 
 customDataSourceOptions.mysql = {
-  type: <'mysql'>process.env.DB_TYPE,
+  type: process.env.DB_TYPE as 'mysql',
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
   username: process.env.DB_USER,
@@ -35,7 +35,7 @@ customDataSourceOptions.mysql = {
 };
 
 customDataSourceOptions.sqlite = {
-  type: <'sqlite'>process.env.DB_TYPE,
+  type: process.env.DB_TYPE as 'sqlite',
   database: process.env.DB_NAME,
   synchronize: false,
   entities: [Server, Channel, Event, Slug, Subscription],
@@ -47,8 +47,9 @@ customDataSourceOptions.sqlite = {
   dropSchema: false,
 };
 
-export const dataSourceOptions: DataSourceOptions & SeederOptions = <
-  DataSourceOptions & SeederOptions
->customDataSourceOptions[process.env.DB_TYPE];
+export const dataSourceOptions: DataSourceOptions & SeederOptions =
+  customDataSourceOptions[
+    process.env.DB_TYPE as keyof typeof customDataSourceOptions
+    ];
 
 export const dataSource: DataSource = new DataSource(dataSourceOptions);
