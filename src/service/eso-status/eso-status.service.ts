@@ -37,7 +37,6 @@ export class EsoStatusService {
       ) {
         return function emit(name: EventType, callback: any): any {
           customEventEmitter.emit(`esoStatus.${name}`, callback);
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           return original(name, callback);
         };
       })(
@@ -54,7 +53,7 @@ export class EsoStatusService {
     const channel: TextChannel = this.client.channels.cache.get(
       channelId,
     ) as TextChannel;
-    await channel?.send({ embeds: [message] });
+    await channel.send({ embeds: [message] });
   }
 
   public generateListenerStatusEmbed(message: string): EmbedBuilder {

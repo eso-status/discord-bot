@@ -40,6 +40,7 @@ import { Subscription } from '../../../src/resource/subscription/entities/subscr
 import { EsoStatusService } from '../../../src/service/eso-status/eso-status.service';
 
 import SpyInstance = jest.SpyInstance;
+import { EsoStatusDataType } from '../../type/esoStatusData.type';
 
 config({ quiet: true });
 
@@ -50,7 +51,7 @@ const testEsoStatusEvent = (
   resolve: (value?: void | PromiseLike<void>) => void,
   event: EventType,
   message: Embed,
-  data?: EsoStatus | EsoStatusMaintenance | EsoStatusSlug,
+  data?: EsoStatusDataType,
 ): void => {
   const method: SpyInstance<Promise<void>> = jest.spyOn(
     app.get(EsoStatusService),
@@ -66,7 +67,7 @@ const testEsoStatusEvent = (
       messageData.embeds[0].data.description === message.data.description &&
       messageData.embeds[0].data.footer.text === message.data.footer.text &&
       messageData.embeds[0].data.footer.icon_url ===
-      message.data.footer.icon_url
+        message.data.footer.icon_url
     ) {
       dataOk = true;
     }
@@ -160,7 +161,7 @@ describe('EsoStatusService (e2e)', (): void => {
     await client.destroy();
   }, 15000);
 
-  it.each(([
+  it.each([
     {
       event: 'maintenancePlanned',
       message: {
@@ -312,10 +313,10 @@ describe('EsoStatusService (e2e)', (): void => {
       },
     },
   ] as {
-      event: EventType;
-      message?: Embed;
-      data?: EsoStatus | EsoStatusMaintenance | EsoStatusSlug;
-    }[]))(
+    event: EventType;
+    message?: Embed;
+    data?: EsoStatus | EsoStatusMaintenance | EsoStatusSlug;
+  }[])(
     'should esoStatus connector event listen',
     async (event: {
       event: EventType;

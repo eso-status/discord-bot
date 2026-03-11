@@ -26,12 +26,12 @@ describe('EsoStatusService', (): void => {
     await app.close();
   }, 15000);
 
-  it.each(([
+  it.each([
     { status: PlannedStatus, icon: ':date:' },
     { status: DownStatus, icon: ':x:' },
     { status: UpStatus, icon: ':white_check_mark:' },
     { status: IssuesStatus, icon: ':wrench:' },
-  ] as { status: Status; icon: string }[]))(
+  ] as { status: Status; icon: string }[])(
     'should esoStatus connector event listen',
     (statusIcon: { status: Status; icon: string }): void => {
       const esoStatusService: EsoStatusService = app.get(EsoStatusService);

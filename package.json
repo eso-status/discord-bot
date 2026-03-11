@@ -31,7 +31,8 @@
     "test:cov": "jest --runInBand --coverage --detectOpenHandles --forceExit",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --runInBand --config ./test/jest-e2e.json",
-    "migration:run": "typeorm migration:run -d ./dist/config/typeorm.config.js"
+    "migration:run": "typeorm migration:run -d ./dist/config/typeorm.config.js",
+    "prepare": "husky"
   },
   "dependencies": {
     "@discord-nestjs/common": "5.3.2",
@@ -53,6 +54,15 @@
     "sqlite3": "5.1.7",
     "typeorm": "0.3.28",
     "typeorm-extension": "3.9.0"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

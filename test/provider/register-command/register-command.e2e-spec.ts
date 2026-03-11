@@ -48,7 +48,7 @@ const testCommand = (
     commandInteractionOptionEvent = { name: 'event', type: 3, value: event };
     commandInteractionOptionList.push(commandInteractionOptionEvent);
   }
-  if (slug !== 'all' as EsoStatusSlug) {
+  if (slug !== ('all' as EsoStatusSlug)) {
     commandInteractionOptionSlug = { name: 'slug', type: 3, value: slug };
     commandInteractionOptionList.push(commandInteractionOptionSlug);
   }
@@ -59,16 +59,16 @@ const testCommand = (
     if (
       messageData.embeds[0].data.description === 'Successfully registered!' &&
       messageData.embeds[0].data.footer.text ===
-      'Data from https://preprod.api.eso-status.com/v3/service' &&
+        'Data from https://preprod.api.eso-status.com/v3/service' &&
       messageData.embeds[0].data.footer.icon_url ===
-      'https://avatars.githubusercontent.com/u/87777413?s=200&v=4'
+        'https://avatars.githubusercontent.com/u/87777413?s=200&v=4'
     ) {
       dataOk = true;
     }
   });
 
   // @ts-expect-error Necessary to emulate Interaction
-  client.emit('interactionCreate', ({
+  client.emit('interactionCreate', {
     isChatInputCommand: (): boolean => true,
     channelId,
     guildId,
@@ -76,18 +76,18 @@ const testCommand = (
     options: {
       _hoistedOptions: commandInteractionOptionList,
       get: (name: string): CommandInteractionOption | null => {
-        if (name === 'event' && event !== 'all' as EventType) {
+        if (name === 'event' && event !== ('all' as EventType)) {
           return commandInteractionOptionEvent;
         }
 
-        if (name === 'slug' && slug !== 'all' as EsoStatusSlug) {
+        if (name === 'slug' && slug !== ('all' as EsoStatusSlug)) {
           return commandInteractionOptionSlug;
         }
 
         return null;
       },
     },
-  } as CommandInteraction));
+  } as CommandInteraction);
 
   setTimeout((): void => {
     if (dataOk) {

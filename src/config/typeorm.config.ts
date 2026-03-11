@@ -50,6 +50,6 @@ customDataSourceOptions.sqlite = {
 export const dataSourceOptions: DataSourceOptions & SeederOptions =
   customDataSourceOptions[
     process.env.DB_TYPE as keyof typeof customDataSourceOptions
-    ];
+  ];
 
 export const dataSource: DataSource = new DataSource(dataSourceOptions);
