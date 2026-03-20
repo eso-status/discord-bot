@@ -27,6 +27,10 @@ jobs:
         run: npm ci
 
       - name: Create env file
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          DISCORD_TESTING_GUILDID: ${{ secrets.DISCORD_TESTING_GUILDID }}
+          DISCORD_TESTING_CHANNELID: ${{ secrets.DISCORD_TESTING_CHANNELID }}
         run: |
           cat .env.example > .env
           sed -i -e "s/__DB_TYPE__/sqlite/g" ./.env
@@ -36,9 +40,9 @@ jobs:
           sed -i -e "s/__DB_USER__//g" ./.env
           sed -i -e "s/__DB_PASSWORD__//g" ./.env
           sed -i -e "s/__DB_DEBUG__//g" ./.env
-          sed -i -e "s/__DISCORD_TOKEN__/${{ secrets.DISCORD_TOKEN }}/g" ./.env
-          sed -i -e "s/__DISCORD_TESTING_GUILDID__/${{ secrets.DISCORD_TESTING_GUILDID }}/g" ./.env
-          sed -i -e "s/__DISCORD_TESTING_CHANNELID__/${{ secrets.DISCORD_TESTING_CHANNELID }}/g" ./.env
+          sed -i -e "s/__DISCORD_TOKEN__/$DISCORD_TOKEN/g" ./.env
+          sed -i -e "s/__DISCORD_TESTING_GUILDID__/$DISCORD_TESTING_GUILDID/g" ./.env
+          sed -i -e "s/__DISCORD_TESTING_CHANNELID__/$DISCORD_TESTING_CHANNELID/g" ./.env
 
       - name: Build assets
         run: npm run build
@@ -53,6 +57,6 @@ jobs:
         run: npm run test:cov
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9
+        uses: SonarSource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9 # 7.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

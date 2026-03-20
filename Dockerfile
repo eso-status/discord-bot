@@ -19,5 +19,4 @@ RUN chown node:node -R ./ \
 
 USER node
 
-# Execute start script
 ENTRYPOINT ["/bin/sh", "/tmp/start.sh"]
