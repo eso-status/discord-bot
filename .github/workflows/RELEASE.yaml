@@ -29,7 +29,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Setup de kubectl
-        uses: azure/setup-kubectl@v4.0.1
+        uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede # 4.0.1
         with:
           version: 'v1.34.4'
 
@@ -40,10 +40,87 @@ jobs:
           echo "$KUBE_CONFIG_B64" | base64 -d > /tmp/kubeconfig.yaml
 
       - name: Fill in the new image ID in the k3s deployment
-        run: kubectl --kubeconfig=/tmp/kubeconfig.yaml --insecure-skip-tls-verify set image deployment/${{ secrets.KUBE_DEPLOYMENT_V3 }} ${{ secrets.HARBOR_CONTAINER_V3 }}=${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}/${{ secrets.HARBOR_REPOSITORY }}:${{ steps.get_version.outputs.version }} -n ${{ secrets.KUBE_NAMESPACE_V3 }}
+        env:
+          KUBE_DEPLOYMENT_V3: ${{ secrets.KUBE_DEPLOYMENT_V3 }}
+          HARBOR_CONTAINER_V3: ${{ secrets.HARBOR_CONTAINER_V3 }}
+          HARBOR_URL: ${{ secrets.HARBOR_URL }}
+          HARBOR_PROJECT: ${{ secrets.HARBOR_PROJECT }}
+          HARBOR_REPOSITORY: ${{ secrets.HARBOR_REPOSITORY }}
+          KUBE_NAMESPACE_V3: ${{ secrets.KUBE_NAMESPACE_V3 }}
+        run: kubectl --kubeconfig=/tmp/kubeconfig.yaml --insecure-skip-tls-verify set image deployment/$KUBE_DEPLOYMENT_V3 $HARBOR_CONTAINER_V3=$HARBOR_URL/$HARBOR_PROJECT/$HARBOR_REPOSITORY:${{ steps.get_version.outputs.version }} -n $KUBE_NAMESPACE_V3
 
       - name: Deploy k3s deployment
-        run: kubectl --kubeconfig=/tmp/kubeconfig.yaml --insecure-skip-tls-verify rollout status deployment/${{ secrets.KUBE_DEPLOYMENT_V3 }} -n ${{ secrets.KUBE_NAMESPACE_V3 }} --timeout=60s
+        timeout-minutes: 10
+        env:
+          KUBE_DEPLOYMENT_V3: ${{ secrets.KUBE_DEPLOYMENT_V3 }}
+          KUBE_NAMESPACE_V3: ${{ secrets.KUBE_NAMESPACE_V3 }}
+        run: kubectl --kubeconfig=/tmp/kubeconfig.yaml --insecure-skip-tls-verify rollout restart deployment/$KUBE_DEPLOYMENT_V3 -n $KUBE_NAMESPACE_V3
+
+      - name: Wait rollout status
+        timeout-minutes: 10
+        env:
+          KUBE_DEPLOYMENT_V3: ${{ secrets.KUBE_DEPLOYMENT_V3 }}
+          KUBE_NAMESPACE_V3: ${{ secrets.KUBE_NAMESPACE_V3 }}
+        run: kubectl --kubeconfig=/tmp/kubeconfig.yaml --insecure-skip-tls-verify rollout status deployment/$KUBE_DEPLOYMENT_V3 -n $KUBE_NAMESPACE_V3 --timeout=5m
+
+      - name: Notify Discord - Déploiement réussi
+        if: success()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          HARBOR_URL: ${{ secrets.HARBOR_URL }}
+          HARBOR_PROJECT: ${{ secrets.HARBOR_PROJECT }}
+          HARBOR_REPOSITORY: ${{ secrets.HARBOR_REPOSITORY }}
+          KUBE_NAMESPACE_V3: ${{ secrets.KUBE_NAMESPACE_V3 }}
+          VERSION: ${{ steps.get_version.outputs.version }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+          SERVER_URL: ${{ github.server_url }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          curl -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"username\": \"GitHub Action\",
+              \"avatar_url\": \"https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png\",
+              \"embeds\": [{
+                \"title\": \"✅ Déploiement réussi\",
+                \"color\": 3066993,
+                \"fields\": [
+                  {\"name\": \"Projet\", \"value\": \"$REPO\", \"inline\": true},
+                  {\"name\": \"Déployé par\", \"value\": \"$ACTOR\", \"inline\": true},
+                  {\"name\": \"Image\", \"value\": \"$HARBOR_URL/$HARBOR_PROJECT/$HARBOR_REPOSITORY:$VERSION\", \"inline\": false},
+                  {\"name\": \"Namespace\", \"value\": \"$KUBE_NAMESPACE_V3\", \"inline\": true}
+                ],
+                \"url\": \"$SERVER_URL/$REPO/actions/runs/$RUN_ID\"
+              }]
+            }"
+
+      - name: Notify Discord - Déploiement échoué
+        if: failure()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          KUBE_DEPLOYMENT_V3: ${{ secrets.KUBE_DEPLOYMENT_V3 }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+          SERVER_URL: ${{ github.server_url }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          curl -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"username\": \"GitHub Action\",
+              \"avatar_url\": \"https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png\",
+              \"embeds\": [{
+                \"title\": \"❌ Déploiement échoué\",
+                \"color\": 15158332,
+                \"fields\": [
+                  {\"name\": \"Projet\", \"value\": \"$REPO\", \"inline\": true},
+                  {\"name\": \"Déclenché par\", \"value\": \"$ACTOR\", \"inline\": true},
+                  {\"name\": \"Deployment\", \"value\": \"$KUBE_DEPLOYMENT_V3\", \"inline\": true},
+                  {\"name\": \"Logs\", \"value\": \"$SERVER_URL/$REPO/actions/runs/$RUN_ID\", \"inline\": false}
+                ]
+              }]
+            }"
 
 #      - name: Create release
 #        env:
