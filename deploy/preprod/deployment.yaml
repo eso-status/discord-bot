@@ -81,4 +81,3 @@ spec:
             memory: 160Mi
       imagePullSecrets:
       - name: eso-status-bot-preprod-harbor-creds
-      priorityClassName: non-production
