@@ -57,3 +57,15 @@ Ses secrets GitHub : `KUBE_CONFIG` (le kubeconfig de ce compte, tiré par `init/
 d'infra), `HARBOR_URL`, `HARBOR_PROJECT`, `HARBOR_REPOSITORY`, `HARBOR_USERNAME` (robot
 `github-cd`), `HARBOR_PASSWORD`, et `CUSTOM_TOKEN` (un jeton fine-grained de l'organisation, droit
 *Contents* en écriture, avec une date d'expiration).
+
+## Grafana
+
+`03-env.sh` pose aussi, sur le Grafana du serveur (`server-setup.md` d'infra, « Grafana ») :
+
+- **son tableau métier** `deploy/grafana/dashboard.json` (salons et serveurs abonnés, ressources,
+  journaux), un seul pour la prod et la preprod : sa liste *Environnement* lit les bases dans
+  MariaDB, et le namespace suit. Sa kustomization le pose dans le dossier *eso-status* ;
+- **l'accès en lecture** de `grafana-reader` à la base de l'environnement.
+
+Le bot ne sert rien en HTTP, donc il n'a pas de sonde. L'alerte « application sans tous ses pods
+prêts » le couvre.
