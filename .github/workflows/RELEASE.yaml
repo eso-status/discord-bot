@@ -31,37 +31,24 @@ jobs:
       - name: Setup de kubectl
         uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede # 4.0.1
         with:
-          version: 'v1.34.4'
+          version: 'v1.35.10'
 
       - name: Setup de la configuration de K3s
         env:
-          KUBE_CONFIG_B64: ${{ secrets.KUBE_CONFIG }}
+          KUBE_CONFIG_B64: ${{ secrets.KUBE_CONFIG_V3 }}
         run: |
           echo "$KUBE_CONFIG_B64" | base64 -d > /tmp/kubeconfig.yaml
 
-      - name: Fill in the new image ID in the k3s deployment
+      # deploy/ is applied whole by kustomize (the runner ships it), at the released version; a value
+      # still to fix stops it first.
+      - name: Apply deploy/ at the released version
         env:
-          KUBE_DEPLOYMENT_V3: ${{ secrets.KUBE_DEPLOYMENT_V3 }}
-          HARBOR_CONTAINER_V3: ${{ secrets.HARBOR_CONTAINER_V3 }}
-          HARBOR_URL: ${{ secrets.HARBOR_URL }}
-          HARBOR_PROJECT: ${{ secrets.HARBOR_PROJECT }}
-          HARBOR_REPOSITORY: ${{ secrets.HARBOR_REPOSITORY }}
-          KUBE_NAMESPACE_V3: ${{ secrets.KUBE_NAMESPACE_V3 }}
-        run: kubectl --kubeconfig=/tmp/kubeconfig.yaml --insecure-skip-tls-verify set image deployment/$KUBE_DEPLOYMENT_V3 $HARBOR_CONTAINER_V3=$HARBOR_URL/$HARBOR_PROJECT/$HARBOR_REPOSITORY:${{ steps.get_version.outputs.version }} -n $KUBE_NAMESPACE_V3
-
-      - name: Deploy k3s deployment
-        timeout-minutes: 10
-        env:
-          KUBE_DEPLOYMENT_V3: ${{ secrets.KUBE_DEPLOYMENT_V3 }}
-          KUBE_NAMESPACE_V3: ${{ secrets.KUBE_NAMESPACE_V3 }}
-        run: kubectl --kubeconfig=/tmp/kubeconfig.yaml --insecure-skip-tls-verify rollout restart deployment/$KUBE_DEPLOYMENT_V3 -n $KUBE_NAMESPACE_V3
-
-      - name: Wait rollout status
-        timeout-minutes: 10
-        env:
-          KUBE_DEPLOYMENT_V3: ${{ secrets.KUBE_DEPLOYMENT_V3 }}
-          KUBE_NAMESPACE_V3: ${{ secrets.KUBE_NAMESPACE_V3 }}
-        run: kubectl --kubeconfig=/tmp/kubeconfig.yaml --insecure-skip-tls-verify rollout status deployment/$KUBE_DEPLOYMENT_V3 -n $KUBE_NAMESPACE_V3 --timeout=5m
+          IMAGE: ${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}/${{ secrets.HARBOR_REPOSITORY }}:${{ steps.get_version.outputs.version }}
+        run: |
+          if grep -rn '<valeur de' deploy/; then exit 1; fi
+          (cd deploy/preprod && kustomize edit set image "eso_status_discord_bot=${IMAGE}")
+          kubectl --kubeconfig=/tmp/kubeconfig.yaml apply -k deploy/preprod/
+          kubectl --kubeconfig=/tmp/kubeconfig.yaml rollout status deployment/eso-status-bot-preprod-deploy -n eso-status-bot-preprod --timeout=5m
 
       - name: Notify Discord - Déploiement réussi
         if: success()
@@ -70,7 +57,7 @@ jobs:
           HARBOR_URL: ${{ secrets.HARBOR_URL }}
           HARBOR_PROJECT: ${{ secrets.HARBOR_PROJECT }}
           HARBOR_REPOSITORY: ${{ secrets.HARBOR_REPOSITORY }}
-          KUBE_NAMESPACE_V3: ${{ secrets.KUBE_NAMESPACE_V3 }}
+          KUBE_NAMESPACE_V3: eso-status-bot-preprod
           VERSION: ${{ steps.get_version.outputs.version }}
           REPO: ${{ github.repository }}
           ACTOR: ${{ github.actor }}
@@ -99,7 +86,7 @@ jobs:
         if: failure()
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          KUBE_DEPLOYMENT_V3: ${{ secrets.KUBE_DEPLOYMENT_V3 }}
+          KUBE_DEPLOYMENT_V3: eso-status-bot-preprod-deploy
           REPO: ${{ github.repository }}
           ACTOR: ${{ github.actor }}
           SERVER_URL: ${{ github.server_url }}

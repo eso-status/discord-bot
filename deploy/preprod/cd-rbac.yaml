@@ -1,0 +1,44 @@
+# The account of the CD (RELEASE.yaml) on the dov118 server: it applies deploy/preprod/ in this
+# namespace and nothing else, so the repository's organisation holds no right over the rest of
+# the server. Applied by deploy/init/03-env.sh, never by the CD, which cannot grant itself rights;
+# its kubeconfig is drawn by init/cd-kubeconfig.sh of dov118/infra.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: eso-status-bot-preprod-cd
+  namespace: eso-status-bot-preprod
+---
+# A durable token: deleting this Secret revokes it.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: eso-status-bot-preprod-cd-token
+  namespace: eso-status-bot-preprod
+  annotations:
+    kubernetes.io/service-account.name: eso-status-bot-preprod-cd
+type: kubernetes.io/service-account-token
+---
+# What kubectl apply -k deploy/preprod/ and kubectl rollout status touch, and only that.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: eso-status-bot-preprod-cd
+  namespace: eso-status-bot-preprod
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: eso-status-bot-preprod-cd
+  namespace: eso-status-bot-preprod
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: eso-status-bot-preprod-cd
+subjects:
+- kind: ServiceAccount
+  name: eso-status-bot-preprod-cd
+  namespace: eso-status-bot-preprod
