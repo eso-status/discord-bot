@@ -1,5 +1,4 @@
-# The Discord bot of eso-status v2, in Recreate: two bots would announce twice, written from what ran on the shelter on 7 November 2026 (migration-infra.md, phase 3,
-# step 2). Applied by kubectl apply -k, the version of the image set in kustomization.yaml.
+# Recreate: two bots on one token would announce everything twice.
 apiVersion: apps/v1
 kind: Deployment
 metadata:

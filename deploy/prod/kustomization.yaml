@@ -1,8 +1,9 @@
-# The version in service on 7 November; the workflow sets the one it deploys.
+# Applied by kubectl apply -k; the CD sets the released image (kustomize edit set image).
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- eso-status-bot.yaml
+- namespace.yaml
+- deployment.yaml
 images:
 - name: eso_status_discord_bot
   newName: harbor.dov118.dev/desastreshow/eso_status_discord_bot

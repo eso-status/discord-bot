@@ -46,8 +46,8 @@ jobs:
           IMAGE: ${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}/${{ secrets.HARBOR_REPOSITORY }}:${{ steps.get_version.outputs.version }}
         run: |
           if grep -rn '<valeur de' deploy/; then exit 1; fi
-          (cd deploy && kustomize edit set image "eso_status_discord_bot=${IMAGE}")
-          kubectl --kubeconfig=/tmp/kubeconfig.yaml apply -k deploy/
+          (cd deploy/prod && kustomize edit set image "eso_status_discord_bot=${IMAGE}")
+          kubectl --kubeconfig=/tmp/kubeconfig.yaml apply -k deploy/prod/
           kubectl --kubeconfig=/tmp/kubeconfig.yaml rollout status deployment/eso-status-bot-deploy -n eso-status-bot --timeout=5m
 
       - name: Create release
