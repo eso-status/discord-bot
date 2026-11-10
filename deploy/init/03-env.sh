@@ -39,6 +39,7 @@ trap 'rm -rf "${tmp_dir}"; minio_close' EXIT
 
 log "Namespace of ${env_name}"
 kubectl apply -f "${manifests}/namespace.yaml"
+kubectl apply -f "${manifests}/cd-rbac.yaml"
 
 log "The application secret"
 {
