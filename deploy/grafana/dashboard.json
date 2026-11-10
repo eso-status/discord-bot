@@ -96,7 +96,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(max by (cluster, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{namespace=\"${namespace}\"})) / sum(kube_pod_container_resource_requests{job=\"kube-state-metrics\", namespace=\"${namespace}\", resource=\"cpu\"})",
+          "expr": "sum(max by (cluster, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m{namespace=\"${namespace}\", pod!~\"cm-acme-http-solver-.*\"})) / sum(kube_pod_container_resource_requests{job=\"kube-state-metrics\", namespace=\"${namespace}\", pod!~\"cm-acme-http-solver-.*\", resource=\"cpu\"})",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -167,7 +167,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(max by (cluster, namespace, pod, container)(container_memory_working_set_bytes{job=\"kubelet\", metrics_path=\"/metrics/cadvisor\", namespace=\"${namespace}\",container!=\"\", image!=\"\"})) / sum(kube_pod_container_resource_requests{job=\"kube-state-metrics\", namespace=\"${namespace}\", resource=\"memory\"})",
+          "expr": "sum(max by (cluster, namespace, pod, container)(container_memory_working_set_bytes{job=\"kubelet\", metrics_path=\"/metrics/cadvisor\", namespace=\"${namespace}\", pod!~\"cm-acme-http-solver-.*\",container!=\"\", image!=\"\"})) / sum(kube_pod_container_resource_requests{job=\"kube-state-metrics\", namespace=\"${namespace}\", pod!~\"cm-acme-http-solver-.*\", resource=\"memory\"})",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -242,7 +242,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(container) (increase(container_cpu_cfs_throttled_periods_total{job=\"kubelet\", metrics_path=\"/metrics/cadvisor\", namespace=\"${namespace}\", container!=\"\"}[$__rate_interval])) / (sum by(container) (increase(container_cpu_cfs_periods_total{job=\"kubelet\", metrics_path=\"/metrics/cadvisor\", namespace=\"${namespace}\", container!=\"\"}[$__rate_interval])))",
+          "expr": "sum by(container) (increase(container_cpu_cfs_throttled_periods_total{job=\"kubelet\", metrics_path=\"/metrics/cadvisor\", namespace=\"${namespace}\", pod!~\"cm-acme-http-solver-.*\", container!=\"\"}[$__rate_interval])) / (sum by(container) (increase(container_cpu_cfs_periods_total{job=\"kubelet\", metrics_path=\"/metrics/cadvisor\", namespace=\"${namespace}\", pod!~\"cm-acme-http-solver-.*\", container!=\"\"}[$__rate_interval])))",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -508,7 +508,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"${namespace}\", container!=\"\", container!=\"POD\"}[$__interval])*1000)",
+          "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"${namespace}\", pod!~\"cm-acme-http-solver-.*\", container!=\"\", container!=\"POD\"}[$__interval])*1000)",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -575,7 +575,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(avg_over_time(container_memory_working_set_bytes{namespace=\"${namespace}\", container!=\"\"}[$__interval]))",
+          "expr": "sum(avg_over_time(container_memory_working_set_bytes{namespace=\"${namespace}\", pod!~\"cm-acme-http-solver-.*\", container!=\"\"}[$__interval]))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -642,7 +642,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(8*rate(container_network_receive_bytes_total{namespace=\"${namespace}\"}[$__rate_interval]))",
+          "expr": "sum(8*rate(container_network_receive_bytes_total{namespace=\"${namespace}\", pod!~\"cm-acme-http-solver-.*\"}[$__rate_interval]))",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -710,7 +710,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(8*rate(container_network_transmit_bytes_total{namespace=\"${namespace}\"}[$__rate_interval]))",
+          "expr": "sum(8*rate(container_network_transmit_bytes_total{namespace=\"${namespace}\", pod!~\"cm-acme-http-solver-.*\"}[$__rate_interval]))",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -777,7 +777,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(avg_over_time(kube_pod_status_phase{namespace=\"${namespace}\", phase=\"Running\"}[$__interval]))",
+          "expr": "sum(avg_over_time(kube_pod_status_phase{namespace=\"${namespace}\", pod!~\"cm-acme-http-solver-.*\", phase=\"Running\"}[$__interval]))",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -849,7 +849,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(container_network_receive_packets_total{job=\"kubelet\", metrics_path=\"/metrics/cadvisor\", namespace=\"${namespace}\"}[$__rate_interval]))",
+          "expr": "sum(rate(container_network_receive_packets_total{job=\"kubelet\", metrics_path=\"/metrics/cadvisor\", namespace=\"${namespace}\", pod!~\"cm-acme-http-solver-.*\"}[$__rate_interval]))",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -891,7 +891,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{namespace=\"${namespace}\"}",
+          "expr": "{namespace=\"${namespace}\", pod!~\"cm-acme-http-solver-.*\"}",
           "queryType": "range",
           "refId": "A"
         }
