@@ -19,6 +19,8 @@ deploy_dir="$(dirname "${init_dir}")"
 . "${INFRA_DIR}/config.env"
 require_var DOMAIN
 require_jq
+# A missing or unreachable source stops the script here, before anything is written.
+[ -z "${SOURCE_KUBECONFIG:-}" ] || require_source
 
 env_name="${1:-}"
 case "${env_name}" in
