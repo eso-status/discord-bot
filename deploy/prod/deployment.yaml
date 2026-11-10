@@ -1,0 +1,83 @@
+# Recreate: two bots on one token would announce everything twice.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eso-status-bot-deploy
+  namespace: eso-status-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eso-status-bot-deploy
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: eso-status-bot-deploy
+    spec:
+      containers:
+      - env:
+        - name: DB_DEBUG
+          value: 'false'
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              key: DB_HOST
+              name: eso-status-bot-database-creds
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              key: DB_NAME
+              name: eso-status-bot-database-creds
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: DB_PASSWORD
+              name: eso-status-bot-database-creds
+        - name: DB_PORT
+          value: '3306'
+        - name: DB_TYPE
+          value: mysql
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              key: DB_USER
+              name: eso-status-bot-database-creds
+        - name: DISCORD_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: DISCORD_TOKEN
+              name: eso-status-bot-app-creds
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: POD_UID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.uid
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        image: eso_status_discord_bot
+        imagePullPolicy: IfNotPresent
+        name: eso-status-discord-bot
+        resources:
+          limits:
+            cpu: 2500m
+            memory: 4Gi
+          requests:
+            cpu: 10m
+            memory: 176Mi
+      imagePullSecrets:
+      - name: eso-status-bot-harbor-creds

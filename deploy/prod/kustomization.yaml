@@ -1,0 +1,11 @@
+# Applied by kubectl apply -k; the CD sets the released image (kustomize edit set image). The
+# namespace and the CD's account (cd-rbac.yaml) stay out: deploy/init/03-env.sh applies them, the
+# CD having no right outside its namespace.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- deployment.yaml
+images:
+- name: eso_status_discord_bot
+  newName: harbor.dov118.dev/desastreshow/eso_status_discord_bot
+  newTag: 1.0.0
