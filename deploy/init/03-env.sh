@@ -4,7 +4,8 @@
 #        server>] deploy/init/03-env.sh prod|preprod
 #
 # Its namespace, its Discord token, its base, user and grant in the shared MariaDB, its pull
-# secret, then deploy/<env>/ applied at the image and replicas in service. The values are stored
+# secret, then deploy/<env>/ applied at the image and replicas in service, and its dashboard in
+# Grafana (deploy/grafana/), which reads the base as grafana-reader. The values are stored
 # in .secrets/ of INFRA_DIR; the first time, read on the desastre server when SOURCE_KUBECONFIG is
 # set, otherwise asked. Created at zero replicas: two bots on one token would announce everything
 # twice, so it starts once the old one is stopped. The data: 05-copy-env.sh.
@@ -64,4 +65,8 @@ harbor_pull_secret "${ns}" "${prefix}-harbor-creds" desastreshow "${secrets_dir}
 
 log "Applying ${manifests}"
 apply_kustomization "${manifests}" "${ns}" "${deployment}" zero-when-new
+
+log "Its dashboard in Grafana"
+grafana_reader_grant "${base}"
+kubectl apply -k "${deploy_dir}/grafana"
 log "The Discord bot of eso-status ${env_name} applied."
