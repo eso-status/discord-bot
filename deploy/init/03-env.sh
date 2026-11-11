@@ -3,12 +3,12 @@
 # Usage: INFRA_DIR=<clone of dov118/infra> [SOURCE_KUBECONFIG=<admin kubeconfig of the desastre
 #        server>] deploy/init/03-env.sh prod|preprod
 #
-# Its namespace, its Discord token, its base, user and grant in the shared MariaDB, its pull
-# secret, then deploy/<env>/ applied at the image and replicas in service, and its dashboard in
-# Grafana (deploy/grafana/), which reads the base as grafana-reader. The values are stored
-# in .secrets/ of INFRA_DIR; the first time, read on the desastre server when SOURCE_KUBECONFIG is
-# set, otherwise asked. Created at zero replicas: two bots on one token would announce everything
-# twice, so it starts once the old one is stopped. The data: 05-copy-env.sh.
+# Its namespace, its Discord token, its base, user and grant in the shared MariaDB, its nightly
+# backup, its pull secret, then deploy/<env>/ applied at the image and replicas in service, and
+# its dashboard in Grafana (deploy/grafana/), which reads the base as grafana-reader. The values
+# are stored in .secrets/ of INFRA_DIR; the first time, read on the desastre server when
+# SOURCE_KUBECONFIG is set, otherwise asked. Created at zero replicas: two bots on one token would
+# announce everything twice, so it starts once the old one is stopped. The data: 05-copy-env.sh.
 set -euo pipefail
 
 init_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -59,6 +59,11 @@ mariadb_base "${base}" "${user}" "${password}"
 printf 'DB_HOST=mariadb.database.svc\nDB_NAME=%s\nDB_USER=%s\nDB_PASSWORD=%s\n' "${base}" "${user}" "${password}" |
   kubectl -n "${ns}" create secret generic "${prefix}-database-creds" --from-env-file=/dev/stdin \
     --dry-run=client -o yaml | kubectl apply -f -
+
+log "Its nightly backup, to the AWS of desastre"
+bucket="$(backup_secret database eso-status desastre "${secrets_dir}")"
+DB_NAME="${base}" BACKUP_BUCKET="${bucket}" render "${manifests}/backup.yaml" "${tmp_dir}/backup.yaml"
+kubectl apply -f "${tmp_dir}/backup.yaml"
 
 log "The Harbor pull secret"
 harbor_pull_secret "${ns}" "${prefix}-harbor-creds" desastreshow "${secrets_dir}/desastreshow-harbor.env"
