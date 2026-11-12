@@ -19,18 +19,18 @@ spec:
   storage:
     s3:
       bucket: ${BACKUP_BUCKET}
-      prefix: bot-prod
+      prefix: eso-status-bot-prod
       endpoint: s3.eu-west-3.amazonaws.com
       region: eu-west-3
       tls:
         enabled: true
       accessKeyIdSecretKeyRef:
-        name: eso-status-backup
+        name: desastre-backup
         key: access-key-id
       secretAccessKeySecretKeyRef:
-        name: eso-status-backup
+        name: desastre-backup
         key: secret-access-key
       ssec:
         customerKeySecretKeyRef:
-          name: eso-status-backup
+          name: desastre-backup
           key: ssec-key

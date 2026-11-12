@@ -61,7 +61,7 @@ printf 'DB_HOST=mariadb.database.svc\nDB_NAME=%s\nDB_USER=%s\nDB_PASSWORD=%s\n' 
     --dry-run=client -o yaml | kubectl apply -f -
 
 log "Its nightly backup, to the AWS of desastre"
-bucket="$(backup_secret database eso-status desastre "${secrets_dir}")"
+bucket="$(backup_secret database desastre "${secrets_dir}")"
 DB_NAME="${base}" BACKUP_BUCKET="${bucket}" render "${manifests}/backup.yaml" "${tmp_dir}/backup.yaml"
 kubectl apply -f "${tmp_dir}/backup.yaml"
 
