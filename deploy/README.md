@@ -44,12 +44,13 @@ En preprod, les mêmes sous le préfixe `eso-status-bot-preprod-`. Les valeurs v
 ## Sauvegarde
 
 `deploy/<env>/backup.yaml`, un `Backup` de mariadb-operator posé par `03-env.sh` dans le
-namespace `database` : chaque nuit (3 h 05 en prod, 3 h 15 en preprod), le dump gzip de la
-base, dans le bucket d'eso-status de **l'AWS de desastre**, sous `bot-<env>/`, chiffré SSE-C
-avec la clé de desastre et gardé 30 jours. Son secret, `eso-status-backup` (namespace `database`), est commun
-aux applis d'eso-status : le bucket et son utilisateur sont demandés une fois
-(`.secrets/eso-status-backup.env`), la clé générée une fois (`.secrets/desastre-backup.env`).
-Marche AWS, restauration et alerte : `server-setup.md` d'infra, « Sauvegardes des applications ».
+namespace `database` : chaque nuit (3 h 05 en prod, 3 h 15 en preprod), le dump gzip de la base,
+`backup.<date>.sql.gz`, dans le bucket de sauvegarde de **desastre** (son AWS), sous
+`eso-status-bot-<env>/`, chiffré SSE-C avec la clé de desastre et gardé 30 jours. Son secret,
+`desastre-backup` (namespace `database`), est commun à toutes les applis de desastre : le
+bucket, les clés de son utilisateur et la clé de chiffrement vivent dans
+`.secrets/desastre-backup.env`. Marche AWS, restauration et messages : `server-setup.md`
+d'infra, « Sauvegardes des applications ».
 
 ## Le CD
 
