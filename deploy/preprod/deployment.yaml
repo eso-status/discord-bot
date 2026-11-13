@@ -74,7 +74,6 @@ spec:
         name: eso-status-discord-bot-preprod
         resources:
           limits:
-            cpu: 2500m
             memory: 4Gi
           requests:
             cpu: 10m
