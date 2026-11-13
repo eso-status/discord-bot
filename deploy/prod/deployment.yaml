@@ -78,6 +78,7 @@ spec:
           requests:
             # CPU: 11.1m at its start on 13/11 evening (5 min rate), divided by 0.7.
             cpu: 16m
-            memory: 176Mi
+            # Memory: 178.3 Mi at its peak on 13/11, the restart after the server reboot, x1.2.
+            memory: 215Mi
       imagePullSecrets:
       - name: eso-status-bot-harbor-creds
