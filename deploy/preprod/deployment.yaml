@@ -77,6 +77,7 @@ spec:
             memory: 4Gi
           requests:
             cpu: 10m
-            memory: 160Mi
+            # Memory: 200.4 Mi at its peak on 13/11, the restart after the server reboot, x1.2.
+            memory: 241Mi
       imagePullSecrets:
       - name: eso-status-bot-preprod-harbor-creds
