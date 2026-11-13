@@ -1,0 +1,36 @@
+# The nightly backup of the base, to the AWS of desastre (server-setup.md of dov118/infra,
+# « Sauvegardes des applications »). In the namespace of the MariaDB, so out of the kustomization:
+# deploy/init/03-env.sh renders the name of the base and of the bucket and applies it, the CD
+# having no right there. The operator keeps 30 days, its default.
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Backup
+metadata:
+  name: eso-status-bot-prod
+  namespace: database
+spec:
+  mariaDbRef:
+    name: mariadb
+  databases:
+    - ${DB_NAME}
+  schedule:
+    cron: "5 3 * * *"
+  timeZone: Europe/Paris
+  compression: gzip
+  storage:
+    s3:
+      bucket: ${BACKUP_BUCKET}
+      prefix: eso-status-bot-prod
+      endpoint: s3.eu-west-3.amazonaws.com
+      region: eu-west-3
+      tls:
+        enabled: true
+      accessKeyIdSecretKeyRef:
+        name: desastre-backup
+        key: access-key-id
+      secretAccessKeySecretKeyRef:
+        name: desastre-backup
+        key: secret-access-key
+      ssec:
+        customerKeySecretKeyRef:
+          name: desastre-backup
+          key: ssec-key

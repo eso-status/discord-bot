@@ -74,10 +74,10 @@ spec:
         name: eso-status-discord-bot
         resources:
           limits:
-            cpu: 2500m
             memory: 4Gi
           requests:
-            cpu: 10m
+            # CPU: 11.1m at its start on 13/11 evening (5 min rate), divided by 0.7.
+            cpu: 16m
             memory: 176Mi
       imagePullSecrets:
       - name: eso-status-bot-harbor-creds
