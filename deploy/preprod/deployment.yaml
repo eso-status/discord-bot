@@ -16,69 +16,81 @@ spec:
       labels:
         app: eso-status-bot-preprod-deploy
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
-      - env:
-        - name: DB_DEBUG
-          value: 'false'
-        - name: DB_HOST
-          valueFrom:
-            secretKeyRef:
-              key: DB_HOST
-              name: eso-status-bot-preprod-database-creds
-        - name: DB_NAME
-          valueFrom:
-            secretKeyRef:
-              key: DB_NAME
-              name: eso-status-bot-preprod-database-creds
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: DB_PASSWORD
-              name: eso-status-bot-preprod-database-creds
-        - name: DB_PORT
-          value: '3306'
-        - name: DB_TYPE
-          value: mysql
-        - name: DB_USER
-          valueFrom:
-            secretKeyRef:
-              key: DB_USER
-              name: eso-status-bot-preprod-database-creds
-        - name: DISCORD_TOKEN
-          valueFrom:
-            secretKeyRef:
-              key: DISCORD_TOKEN
-              name: eso-status-bot-preprod-app-creds
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.namespace
-        - name: POD_UID
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.uid
-        - name: POD_IP
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: status.podIP
-        image: eso_status_discord_bot
-        imagePullPolicy: IfNotPresent
-        name: eso-status-discord-bot-preprod
-        resources:
-          limits:
-            memory: 4Gi
-          requests:
-            cpu: 10m
-            # Memory: 200.4 Mi at its peak over 7 days on 14/11, divided by 0.7: at its peak, the
-            # container stays under 70 % of its reservation.
-            memory: 287Mi
+        - env:
+            - name: DB_DEBUG
+              value: 'false'
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: DB_HOST
+                  name: eso-status-bot-preprod-database-creds
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: DB_NAME
+                  name: eso-status-bot-preprod-database-creds
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: DB_PASSWORD
+                  name: eso-status-bot-preprod-database-creds
+            - name: DB_PORT
+              value: '3306'
+            - name: DB_TYPE
+              value: mysql
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: DB_USER
+                  name: eso-status-bot-preprod-database-creds
+            - name: DISCORD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: DISCORD_TOKEN
+                  name: eso-status-bot-preprod-app-creds
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: POD_UID
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.uid
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+          image: eso_status_discord_bot
+          imagePullPolicy: IfNotPresent
+          name: eso-status-discord-bot-preprod
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            limits:
+              memory: 4Gi
+            requests:
+              cpu: 10m
+              # Memory: 200.4 Mi at its peak over 7 days on 14/11, divided by 0.7: at its peak, the
+              # container stays under 70 % of its reservation.
+              memory: 287Mi
       imagePullSecrets:
-      - name: eso-status-bot-preprod-harbor-creds
+        - name: eso-status-bot-preprod-harbor-creds

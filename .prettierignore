@@ -8,3 +8,7 @@ node_modules
 # Ignore all HTML files:
 .gitignore
 .prettierignore
+
+# ⚠️ deploy/init/03-env.sh (apply_kustomization of dov118/infra) finds the image tag by its exact
+# indentation, `^  newTag: `: the deeper list indentation of prettier hides it and stops the script.
+deploy/*/kustomization.yaml

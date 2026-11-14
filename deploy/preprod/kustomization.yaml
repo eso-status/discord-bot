@@ -1,6 +1,5 @@
-# Applied by kubectl apply -k; the CD sets the released image (kustomize edit set image). The
-# namespace and the CD's account (cd-rbac.yaml) stay out: deploy/init/03-env.sh applies them, the
-# CD having no right outside its namespace.
+# Applied by deploy/init/03-env.sh at the image in service, which the CD moves (kubectl set image).
+# The namespace and the CD's account (cd-rbac.yaml) stay out: 03-env.sh applies them on their own.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:

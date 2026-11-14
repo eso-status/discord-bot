@@ -2,7 +2,8 @@
 
 > Manifestes versionnés **par environnement** dans `prod/` (v2, branche `main`) et `preprod/` (v3,
 > branche `preprod`) : `namespace.yaml`, `deployment.yaml`, `cd-rbac.yaml` (le compte du CD) et
-> `kustomization.yaml`. Ils sont posés par **`init/03-env.sh <env>`**, puis tenus à jour par le CD.
+> `kustomization.yaml`. Ils sont posés par **`init/03-env.sh <env>`** ; le CD ne fait que changer
+> l'image du déploiement.
 >
 > Infra sous-jacente (cluster, Harbor, **MariaDB partagé**…) : le runbook de
 > [`dov118/infra`](https://github.com/dov118/infra), `server-setup.md`.
@@ -56,21 +57,22 @@ d'infra, « Sauvegardes des applications ».
 
 1. Un push sur `release/<version>` : `CD.yaml` construit l'image, la pousse dans
    `harbor.dov118.dev/desastreshow/eso_status_discord_bot:<version>` et pose le tag.
-2. La PR `release/<version>` (ouverte à la main) fusionnée dans `main` : `RELEASE.yaml` fixe
-   cette image dans `deploy/prod/` (`kustomize edit set image`), l'applique (`kubectl apply -k`),
-   attend le déploiement, puis crée la release GitHub.
+2. La PR `release/<version>` (ouverte à la main) fusionnée dans `main` : `RELEASE.yaml` passe
+   le déploiement sur cette image (`kubectl set image`), attend le déploiement, puis crée la
+   release GitHub.
 
-Il agit par le compte **`eso-status-bot-cd`** (`cd-rbac.yaml`), limité à son Deployment : il ne lit
-aucun secret et ne touche à rien d'autre sur le serveur. Le namespace et ce compte restent hors de
-la kustomization : c'est `03-env.sh` qui les pose.
+Il agit par le compte **`eso-status-bot-cd`** (`cd-rbac.yaml`), limité au changement d'image de son
+Deployment : il ne lit aucun secret et ne touche à rien d'autre sur le serveur. Tout le reste de
+`deploy/<env>/` (manifestes, réglages du déploiement, ce compte) est posé par `03-env.sh`, qui garde
+l'image en service : un changement de `deploy/` s'applique en le rejouant.
 
 Ses secrets GitHub : `KUBE_CONFIG` (le kubeconfig de ce compte, tiré par `init/cd-kubeconfig.sh`
 d'infra), `HARBOR_URL`, `HARBOR_PROJECT`, `HARBOR_REPOSITORY`, `HARBOR_USERNAME` (robot
 `github-cd`), `HARBOR_PASSWORD`, et `CUSTOM_TOKEN` (un jeton fine-grained de l'organisation, droit
-*Contents* en écriture, avec une date d'expiration).
+_Contents_ en écriture, avec une date d'expiration).
 
-En preprod (v3, branche `preprod`) : la PR `release/<version>` fusionnée dans `preprod` applique
-`deploy/preprod/`, sans release GitHub, par le compte **`eso-status-bot-preprod-cd`**. Les secrets
+En preprod (v3, branche `preprod`) : la PR `release/<version>` fusionnée dans `preprod` passe le
+déploiement sur l'image, sans release GitHub, par le compte **`eso-status-bot-preprod-cd`**. Les secrets
 d'un dépôt valent pour toutes ses branches, et chaque compte ne voit que son namespace : le sien
 est le secret **`KUBE_CONFIG_V3`**.
 
@@ -79,8 +81,8 @@ est le secret **`KUBE_CONFIG_V3`**.
 `03-env.sh` pose aussi, sur le Grafana du serveur (`server-setup.md` d'infra, « Grafana ») :
 
 - **son tableau métier** `deploy/grafana/dashboard.json` (salons et serveurs abonnés, ressources,
-  journaux), un seul pour la prod et la preprod : sa liste *Environnement* lit les bases dans
-  MariaDB, et le namespace suit. Sa kustomization le pose dans le dossier *eso-status* ;
+  journaux), un seul pour la prod et la preprod : sa liste _Environnement_ lit les bases dans
+  MariaDB, et le namespace suit. Sa kustomization le pose dans le dossier _eso-status_ ;
 - **l'accès en lecture** de `grafana-reader` à la base de l'environnement.
 
 Le bot ne sert rien en HTTP, donc il n'a pas de sonde. L'alerte « application sans tous ses pods
