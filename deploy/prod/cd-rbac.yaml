@@ -1,5 +1,5 @@
-# The account of the CD (RELEASE.yaml) on the dov118 server: it applies deploy/prod/ in this
-# namespace and nothing else, so the repository's organisation holds no right over the rest of
+# The account of the CD (RELEASE.yaml) on the dov118 server: it moves the image of the bot's
+# deployment and nothing else, so the repository's organisation holds no right over the rest of
 # the server. Applied by deploy/init/03-env.sh, never by the CD, which cannot grant itself rights;
 # its kubeconfig is drawn by init/cd-kubeconfig.sh of dov118/infra.
 apiVersion: v1
@@ -18,7 +18,7 @@ metadata:
     kubernetes.io/service-account.name: eso-status-bot-cd
 type: kubernetes.io/service-account-token
 ---
-# What kubectl apply -k deploy/prod/ and kubectl rollout status touch, and only that.
+# What kubectl set image and kubectl rollout status touch, and only that.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -27,7 +27,7 @@ metadata:
 rules:
 - apiGroups: ["apps"]
   resources: ["deployments"]
-  verbs: ["get", "list", "watch", "create", "update", "patch"]
+  verbs: ["get", "list", "watch", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
