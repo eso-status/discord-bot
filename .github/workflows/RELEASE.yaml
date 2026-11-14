@@ -9,7 +9,8 @@ on:
 jobs:
   release:
     name: RELEASE
-    runs-on: ubuntu-latest
+    # 24.04 rather than latest: it carries skopeo (runner-images readme), latest moves to 26.04.
+    runs-on: ubuntu-24.04
     if: contains(github.head_ref, 'release/')
     timeout-minutes: 30
     steps:
@@ -49,6 +50,21 @@ jobs:
           (cd deploy/prod && kustomize edit set image "eso_status_discord_bot=${IMAGE}")
           kubectl --kubeconfig=/tmp/kubeconfig.yaml apply -k deploy/prod/
           kubectl --kubeconfig=/tmp/kubeconfig.yaml rollout status deployment/eso-status-bot-deploy -n eso-status-bot --timeout=5m
+
+      - name: Login to Harbor
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # 4.8.0
+        with:
+          registry: ${{ secrets.HARBOR_URL }}
+          username: ${{ secrets.HARBOR_USERNAME }}
+          password: ${{ secrets.HARBOR_PASSWORD }}
+
+      # Harbor keeps whatever an environment runs: its rule « retain always » on deployed-* holds
+      # this image whatever the releases pushed after it (server-setup.md of dov118/infra). The
+      # same digest gets the tag, read with the credentials of the Harbor login of this job.
+      - name: Mark the image as deployed
+        env:
+          IMAGE: ${{ secrets.HARBOR_URL }}/${{ secrets.HARBOR_PROJECT }}/${{ secrets.HARBOR_REPOSITORY }}:${{ steps.get_version.outputs.version }}
+        run: skopeo copy --all --preserve-digests "docker://${IMAGE}" "docker://${IMAGE%:*}:deployed-prod"
 
       - name: Create release
         env:
