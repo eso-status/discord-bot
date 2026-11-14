@@ -5,7 +5,7 @@ import {
   Status,
   UpStatus,
 } from '@eso-status/types';
-import { INestApplication } from '@nestjs/common';
+import { INestApplicationContext } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
 import { config } from 'dotenv';
@@ -16,9 +16,9 @@ import { EsoStatusService } from '../../../src/service/eso-status/eso-status.ser
 config({ quiet: true });
 
 describe('EsoStatusService', (): void => {
-  let app: INestApplication;
+  let app: INestApplicationContext;
   beforeAll(async (): Promise<void> => {
-    app = await NestFactory.create(AppModule);
+    app = await NestFactory.createApplicationContext(AppModule);
     await app.init();
   }, 15000);
 

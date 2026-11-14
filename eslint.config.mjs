@@ -38,6 +38,10 @@ export default defineConfig([
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-useless-constructor': 'error',
       '@typescript-eslint/no-empty-function': 'error',
+      '@typescript-eslint/no-extraneous-class': [
+        'error',
+        { allowWithDecorator: true },
+      ],
     },
   },
   {

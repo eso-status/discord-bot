@@ -4,6 +4,4 @@ import EsoStatus, {
 } from '@eso-status/types';
 
 export type EsoStatusDataType =
-  | EsoStatus
-  | EsoStatusMaintenance
-  | EsoStatusSlug;
+  EsoStatus | EsoStatusMaintenance | EsoStatusSlug;
