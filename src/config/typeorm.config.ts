@@ -35,7 +35,7 @@ customDataSourceOptions.mysql = {
 };
 
 customDataSourceOptions.sqlite = {
-  type: process.env.DB_TYPE as 'sqlite',
+  type: 'better-sqlite3',
   database: process.env.DB_NAME,
   synchronize: false,
   entities: [Server, Channel, Event, Slug, Subscription],
