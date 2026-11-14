@@ -77,7 +77,8 @@ spec:
             memory: 4Gi
           requests:
             cpu: 10m
-            # Memory: 200.4 Mi at its peak on 13/11, the restart after the server reboot, x1.2.
-            memory: 241Mi
+            # Memory: 200.4 Mi at its peak over 7 days on 14/11, divided by 0.7: at its peak, the
+            # container stays under 70 % of its reservation.
+            memory: 287Mi
       imagePullSecrets:
       - name: eso-status-bot-preprod-harbor-creds
