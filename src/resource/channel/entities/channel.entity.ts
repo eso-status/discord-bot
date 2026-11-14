@@ -17,7 +17,7 @@ export class Channel {
   })
   id: number;
 
-  @Column({ type: 'varchar', length: 18, nullable: false })
+  @Column({ type: 'varchar', length: 20, nullable: false })
   channelId: string;
 
   @Column({ type: 'int', nullable: false })
