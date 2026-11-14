@@ -1,4 +1,7 @@
 {
   "extends": "./tsconfig.json",
-  "includes": ["src", "test"]
+  "include": ["src", "test"],
+  "compilerOptions": {
+    "strictNullChecks": true
+  }
 }

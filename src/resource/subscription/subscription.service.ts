@@ -28,7 +28,7 @@ export class SubscriptionService {
   public async deleteByChannelId(channelId: number): Promise<void> {
     const subscriptionList: Subscription[] =
       await this.subscriptionRepository.find({
-        relations: ['channel'],
+        relations: { channel: true },
         where: {
           channel: {
             id: channelId,
