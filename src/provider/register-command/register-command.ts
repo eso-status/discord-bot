@@ -1,26 +1,18 @@
-import { SlashCommandPipe } from '@discord-nestjs/common';
-import {
-  Command,
-  Handler,
-  IA,
-  InjectDiscordClient,
-} from '@discord-nestjs/core';
-
 import { Slug as EsoStatusSlug } from '@eso-status/types';
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import {
+  ChatInputCommandInteraction,
   Client,
-  CommandInteraction,
   EmbedBuilder,
-  InteractionReplyOptions,
-  TextChannel,
+  Events,
+  Interaction,
 } from 'discord.js';
-import { Channel } from 'src/resource/channel/entities/channel.entity';
+import { Channel } from '../../resource/channel/entities/channel.entity';
 
-import { Event } from 'src/resource/event/entities/event.entity';
+import { Event } from '../../resource/event/entities/event.entity';
 
-import { EventType } from 'src/type/event.type';
+import { EventType } from '../../type/event.type';
 
 import { ChannelService } from '../../resource/channel/channel.service';
 import { EventService } from '../../resource/event/event.service';
@@ -30,46 +22,44 @@ import { Slug } from '../../resource/slug/entities/slug.entity';
 import { SlugService } from '../../resource/slug/slug.service';
 import { SubscriptionService } from '../../resource/subscription/subscription.service';
 
-import { RegisterDto } from './register.dto';
+import { registerCommandDefinition } from './register-command.definition';
 
-@Command({
-  name: 'register',
-  description: 'Register to received EsoStatus event',
-})
 @Injectable()
-export class RegisterCommand {
+export class RegisterCommand implements OnModuleInit {
+  private readonly logger: Logger = new Logger(RegisterCommand.name);
+
   constructor(
     private readonly eventService: EventService,
     private readonly slugService: SlugService,
     private readonly serverService: ServerService,
     private readonly channelService: ChannelService,
     private readonly subscriptionService: SubscriptionService,
-    @InjectDiscordClient()
     private readonly client: Client,
   ) {}
 
-  @Handler()
-  public async onRegister(
-    @IA(SlashCommandPipe) dto: RegisterDto,
-    @IA() interaction: CommandInteraction,
-  ): Promise<InteractionReplyOptions> {
-    const channel: TextChannel = this.client.channels.cache.get(
-      interaction.channelId,
-    ) as TextChannel;
-    await channel.send({
-      embeds: [
-        this.generateEmbed(
-          await this.doOnRegister(
-            interaction.guildId,
-            interaction.channelId,
-            dto.event,
-            dto.slug,
-          ),
-        ),
-      ],
+  public onModuleInit(): void {
+    this.client.on(Events.ClientReady, (readyClient: Client<true>): void => {
+      void this.registerCommand(readyClient);
     });
+    this.client.on(
+      Events.InteractionCreate,
+      (interaction: Interaction): void => {
+        void this.handleInteraction(interaction);
+      },
+    );
+  }
 
-    return {};
+  public async onRegister(
+    interaction: ChatInputCommandInteraction,
+  ): Promise<void> {
+    const message: string = await this.doOnRegister(
+      interaction.guildId,
+      interaction.channelId,
+      (interaction.options.getString('event') ?? 'all') as EventType,
+      (interaction.options.getString('slug') ?? 'all') as EsoStatusSlug,
+    );
+
+    await interaction.reply({ embeds: [this.generateEmbed(message)] });
   }
 
   public generateEmbed(message: string): EmbedBuilder {
@@ -98,12 +88,13 @@ export class RegisterCommand {
         ? await this.slugService.getAll()
         : [await this.slugService.getBySlug(slug)];
 
-    let server: Server | null = await this.serverService.getByServerId(guildId);
-    server ??= await this.serverService.add(guildId);
+    const server: Server =
+      (await this.serverService.getByServerId(guildId)) ??
+      (await this.serverService.add(guildId));
 
-    let channel: Channel | null =
-      await this.channelService.getByChannelId(channelId);
-    channel ??= await this.channelService.add(channelId, server.id);
+    const channel: Channel =
+      (await this.channelService.getByChannelId(channelId)) ??
+      (await this.channelService.add(channelId, server.id));
 
     await this.subscriptionService.deleteByChannelId(channel.id);
 
@@ -122,5 +113,34 @@ export class RegisterCommand {
     );
 
     return 'Successfully registered!';
+  }
+
+  private async registerCommand(readyClient: Client<true>): Promise<void> {
+    try {
+      await readyClient.application.commands.create(registerCommandDefinition);
+    } catch (error) {
+      this.logger.error(
+        'The register command could not be registered',
+        error instanceof Error ? error.stack : String(error),
+      );
+    }
+  }
+
+  private async handleInteraction(interaction: Interaction): Promise<void> {
+    if (
+      !interaction.isChatInputCommand() ||
+      interaction.commandName !== registerCommandDefinition.name
+    ) {
+      return;
+    }
+
+    try {
+      await this.onRegister(interaction);
+    } catch (error) {
+      this.logger.error(
+        'The register command failed',
+        error instanceof Error ? error.stack : String(error),
+      );
+    }
   }
 }

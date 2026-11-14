@@ -1,7 +1,5 @@
-import * as EventEmitter from 'events';
+import EventEmitter from 'events';
 
-import { EventType } from '@discord-nestjs/core/dist/definitions/types/event.type';
-import { ClientService } from '@discord-nestjs/core/dist/services/client.service';
 import { EsoStatusConnector } from '@eso-status/connector';
 import EsoStatus, {
   EsoStatusMaintenance,
@@ -17,10 +15,10 @@ import EsoStatus, {
   Slug as EsoStatusSlug,
   UpStatus,
 } from '@eso-status/types';
-import { INestApplication } from '@nestjs/common';
+import { INestApplicationContext } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
-import { Client, Embed, Message } from 'discord.js';
+import { Client, Embed, Events, Message } from 'discord.js';
 
 import { config } from 'dotenv';
 import { Repository } from 'typeorm';
@@ -38,6 +36,7 @@ import { Slug } from '../../../src/resource/slug/entities/slug.entity';
 
 import { Subscription } from '../../../src/resource/subscription/entities/subscription.entity';
 import { EsoStatusService } from '../../../src/service/eso-status/eso-status.service';
+import { EventType } from '../../../src/type/event.type';
 
 import SpyInstance = jest.SpyInstance;
 import { EsoStatusDataType } from '../../type/esoStatusData.type';
@@ -46,7 +45,7 @@ config({ quiet: true });
 
 const testEsoStatusEvent = (
   client: Client,
-  app: INestApplication,
+  app: INestApplicationContext,
   esoStatusServer: EventEmitter,
   resolve: (value?: void | PromiseLike<void>) => void,
   event: EventType,
@@ -55,7 +54,6 @@ const testEsoStatusEvent = (
 ): void => {
   const method: SpyInstance<Promise<void>> = jest.spyOn(
     app.get(EsoStatusService),
-    // @ts-expect-error Necessary to get dynamically method
     event,
   );
 
@@ -77,15 +75,16 @@ const testEsoStatusEvent = (
 
   setTimeout((): void => {
     if (dataOk) {
-      expect(method).toHaveBeenCalledWith(data);
+      expect(method).toHaveBeenCalledWith(
+        ...(data === undefined ? [] : [data]),
+      );
       resolve();
     }
   }, 10000);
 };
 
 describe('EsoStatusService (e2e)', (): void => {
-  let app: INestApplication;
-  let clientService: ClientService;
+  let app: INestApplicationContext;
   let client: Client;
   let esoStatusServer: EventEmitter;
   let subscriptionRepository: Repository<Subscription>;
@@ -98,11 +97,10 @@ describe('EsoStatusService (e2e)', (): void => {
     await dataSource.runMigrations();
     await runSeeders(dataSource);
 
-    app = await NestFactory.create(AppModule);
+    app = await NestFactory.createApplicationContext(AppModule);
     await app.init();
-    clientService = app.get(ClientService);
 
-    client = clientService.getClient();
+    client = app.get(Client);
     esoStatusServer = new EventEmitter();
     jest
       .spyOn(EsoStatusConnector, 'listen')
@@ -337,7 +335,7 @@ describe('EsoStatusService (e2e)', (): void => {
             );
           }
 
-          client.on('ready', (): void => {
+          client.on(Events.ClientReady, (): void => {
             testEsoStatusEvent(
               client,
               app,
@@ -350,7 +348,6 @@ describe('EsoStatusService (e2e)', (): void => {
           });
         },
       );
-      expect(true).toBe(true);
     },
     15000,
   );
