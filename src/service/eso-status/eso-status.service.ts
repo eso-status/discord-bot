@@ -1,39 +1,45 @@
-import { InjectDiscordClient } from '@discord-nestjs/core';
 import { EsoStatusConnector } from '@eso-status/connector';
 import { EsoStatus, MaintenanceEsoStatus, Status } from '@eso-status/types';
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
-import { Client, EmbedBuilder, TextChannel } from 'discord.js';
+import { Client, EmbedBuilder, Events, TextChannel } from 'discord.js';
 
 import { ChannelService } from '../../resource/channel/channel.service';
 import { Channel } from '../../resource/channel/entities/channel.entity';
-import { EventType } from '../../type/event.type';
 
 @Injectable()
 export class EsoStatusService {
   constructor(
-    private eventEmitter: EventEmitter2,
+    private readonly eventEmitter: EventEmitter2,
     private readonly channelService: ChannelService,
-    @InjectDiscordClient()
     private readonly client: Client,
   ) {
-    let esoStatusEventEmitter: EsoStatusConnector;
-    this.client.on('ready', (): void => {
-      esoStatusEventEmitter = EsoStatusConnector.listen();
-      esoStatusEventEmitter.emit = (function replaceEmit(
-        original: any,
-        customEventEmitter: EventEmitter2,
-      ) {
-        return function emit(name: EventType, callback: any): any {
-          customEventEmitter.emit(`esoStatus.${name}`, callback);
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-          return original(name, callback);
-        };
-      })(
-        esoStatusEventEmitter.emit.bind(esoStatusEventEmitter),
-        this.eventEmitter,
-      );
+    this.client.on(Events.ClientReady, (): void => {
+      const esoStatusConnector: EsoStatusConnector =
+        EsoStatusConnector.listen();
+      esoStatusConnector
+        .on(
+          'maintenancePlanned',
+          (maintenanceEsoStatus: MaintenanceEsoStatus): void => {
+            this.eventEmitter.emit(
+              'esoStatus.maintenancePlanned',
+              maintenanceEsoStatus,
+            );
+          },
+        )
+        .on('statusUpdate', (esoStatus: EsoStatus): void => {
+          this.eventEmitter.emit('esoStatus.statusUpdate', esoStatus);
+        })
+        .on('connected', (): void => {
+          this.eventEmitter.emit('esoStatus.connected');
+        })
+        .on('disconnect', (): void => {
+          this.eventEmitter.emit('esoStatus.disconnect');
+        })
+        .on('reconnect', (): void => {
+          this.eventEmitter.emit('esoStatus.reconnect');
+        });
     });
   }
 
@@ -41,9 +47,9 @@ export class EsoStatusService {
     channelId: string,
     message: EmbedBuilder,
   ): Promise<void> {
-    const channel: TextChannel = this.client.channels.cache.get(
+    const channel: TextChannel | undefined = this.client.channels.cache.get(
       channelId,
-    ) as TextChannel;
+    ) as TextChannel | undefined;
     await channel?.send({ embeds: [message] });
   }
 
@@ -107,12 +113,11 @@ export class EsoStatusService {
       await this.channelService.getBySubscriptionEvent('connected');
 
     await Promise.all(
-      channelList.map(
-        async (channel: Channel): Promise<void> =>
-          this.sendMessage(
-            channel.channelId,
-            this.generateListenerStatusEmbed('Eso status API connected!'),
-          ),
+      channelList.map(async (channel: Channel): Promise<void> =>
+        this.sendMessage(
+          channel.channelId,
+          this.generateListenerStatusEmbed('Eso status API connected!'),
+        ),
       ),
     );
   }
@@ -123,12 +128,11 @@ export class EsoStatusService {
       await this.channelService.getBySubscriptionEvent('disconnect');
 
     await Promise.all(
-      channelList.map(
-        async (channel: Channel): Promise<void> =>
-          this.sendMessage(
-            channel.channelId,
-            this.generateListenerStatusEmbed('Eso status API disconnected!'),
-          ),
+      channelList.map(async (channel: Channel): Promise<void> =>
+        this.sendMessage(
+          channel.channelId,
+          this.generateListenerStatusEmbed('Eso status API disconnected!'),
+        ),
       ),
     );
   }
@@ -139,12 +143,11 @@ export class EsoStatusService {
       await this.channelService.getBySubscriptionEvent('reconnect');
 
     await Promise.all(
-      channelList.map(
-        async (channel: Channel): Promise<void> =>
-          this.sendMessage(
-            channel.channelId,
-            this.generateListenerStatusEmbed('Eso status API reconnected!'),
-          ),
+      channelList.map(async (channel: Channel): Promise<void> =>
+        this.sendMessage(
+          channel.channelId,
+          this.generateListenerStatusEmbed('Eso status API reconnected!'),
+        ),
       ),
     );
   }
@@ -158,12 +161,11 @@ export class EsoStatusService {
       );
 
     await Promise.all(
-      channelList.map(
-        async (channel: Channel): Promise<void> =>
-          this.sendMessage(
-            channel.channelId,
-            this.generateMaintenancePlannedEmbed(maintenanceEsoStatus),
-          ),
+      channelList.map(async (channel: Channel): Promise<void> =>
+        this.sendMessage(
+          channel.channelId,
+          this.generateMaintenancePlannedEmbed(maintenanceEsoStatus),
+        ),
       ),
     );
   }
@@ -177,12 +179,11 @@ export class EsoStatusService {
       );
 
     await Promise.all(
-      channelList.map(
-        async (channel: Channel): Promise<void> =>
-          this.sendMessage(
-            channel.channelId,
-            this.generateStatusEmbed(esoStatus),
-          ),
+      channelList.map(async (channel: Channel): Promise<void> =>
+        this.sendMessage(
+          channel.channelId,
+          this.generateStatusEmbed(esoStatus),
+        ),
       ),
     );
   }

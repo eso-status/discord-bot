@@ -1,19 +1,15 @@
-import {
-  DiscordModuleAsyncOptions,
-  DiscordModuleOption,
-} from '@discord-nestjs/core';
-import { GatewayIntentBits } from 'discord.js';
+import { FactoryProvider } from '@nestjs/common';
+import { Client, GatewayIntentBits } from 'discord.js';
 import { config } from 'dotenv';
 
-config();
+config({ quiet: true });
 
-const discordConfig: DiscordModuleAsyncOptions = {
-  useFactory: (): DiscordModuleOption => ({
-    token: process.env.DISCORD_TOKEN,
-    discordClientOptions: {
+const discordClientProvider: FactoryProvider<Client> = {
+  provide: Client,
+  useFactory: (): Client =>
+    new Client({
       intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
-    },
-  }),
+    }),
 };
 
-export { discordConfig };
+export { discordClientProvider };

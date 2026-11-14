@@ -1,9 +1,8 @@
-import { DiscordModule } from '@discord-nestjs/core';
 import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { discordConfig } from './config/discord.config';
+import { discordClientProvider } from './config/discord.config';
 import { dataSourceOptions } from './config/typeorm.config';
 import { RegisterCommand } from './provider/register-command/register-command';
 
@@ -17,16 +16,18 @@ import { Slug } from './resource/slug/entities/slug.entity';
 import { SlugService } from './resource/slug/slug.service';
 import { Subscription } from './resource/subscription/entities/subscription.entity';
 import { SubscriptionService } from './resource/subscription/subscription.service';
+import { DiscordLifecycleService } from './service/discord/discord-lifecycle.service';
 import { EsoStatusService } from './service/eso-status/eso-status.service';
 
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
-    DiscordModule.forRootAsync(discordConfig),
     TypeOrmModule.forRoot(dataSourceOptions),
     TypeOrmModule.forFeature([Event, Slug, Server, Channel, Subscription]),
   ],
   providers: [
+    discordClientProvider,
+    DiscordLifecycleService,
     EventService,
     SlugService,
     ServerService,
