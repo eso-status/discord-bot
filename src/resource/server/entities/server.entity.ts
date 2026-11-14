@@ -1,4 +1,4 @@
-import { Channel } from 'src/resource/channel/entities/channel.entity';
+import { Channel } from '../../channel/entities/channel.entity';
 import {
   Column,
   CreateDateColumn,
@@ -14,7 +14,7 @@ export class Server {
   })
   id: number;
 
-  @Column({ type: 'varchar', length: 18, nullable: false })
+  @Column({ type: 'varchar', length: 20, nullable: false })
   serverId: string;
 
   @CreateDateColumn({

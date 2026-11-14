@@ -1,20 +1,18 @@
-import * as EventEmitter from 'events';
+import EventEmitter from 'events';
 
-import { EventType } from '@discord-nestjs/core/dist/definitions/types/event.type';
-import { ClientService } from '@discord-nestjs/core/dist/services/client.service';
 import { EsoStatusConnector } from '@eso-status/connector';
 import {
   EsoStatus,
   MaintenanceEsoStatus,
   Slug as EsoStatusSlug,
 } from '@eso-status/types';
-import { INestApplication } from '@nestjs/common';
+import { INestApplicationContext } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
-import { Client, Embed, Message } from 'discord.js';
+import { Client, Embed, Events, Message } from 'discord.js';
 
 import { config } from 'dotenv';
-import * as moment from 'moment/moment';
+import moment from 'moment';
 import { Repository } from 'typeorm';
 import { runSeeders } from 'typeorm-extension';
 
@@ -30,27 +28,29 @@ import { Slug } from '../../../src/resource/slug/entities/slug.entity';
 
 import { Subscription } from '../../../src/resource/subscription/entities/subscription.entity';
 import { EsoStatusService } from '../../../src/service/eso-status/eso-status.service';
+import { EventType } from '../../../src/type/event.type';
 
 import SpyInstance = jest.SpyInstance;
 
-config();
+config({ quiet: true });
+
+type EsoStatusEventData = EsoStatus | MaintenanceEsoStatus | EsoStatusSlug;
 
 const testEsoStatusEvent = (
   client: Client,
-  app: INestApplication,
+  app: INestApplicationContext,
   esoStatusServer: EventEmitter,
   resolve: (value?: void | PromiseLike<void>) => void,
   event: EventType,
   message: Embed,
-  data?: EsoStatus | MaintenanceEsoStatus | EsoStatusSlug,
+  data?: EsoStatusEventData,
 ): void => {
   const method: SpyInstance<Promise<void>> = jest.spyOn(
     app.get(EsoStatusService),
-    // @ts-expect-error Necessary to get dynamically method
     event,
   );
 
-  let dataOk: boolean = false;
+  let dataOk = false;
 
   client.on('messageCreate', (messageData: Message): void => {
     if (
@@ -68,15 +68,16 @@ const testEsoStatusEvent = (
 
   setTimeout((): void => {
     if (dataOk) {
-      expect(method).toHaveBeenCalledWith(data);
+      expect(method).toHaveBeenCalledWith(
+        ...(data === undefined ? [] : [data]),
+      );
       resolve();
     }
   }, 10000);
 };
 
 describe('EsoStatusService (e2e)', (): void => {
-  let app: INestApplication;
-  let clientService: ClientService;
+  let app: INestApplicationContext;
   let client: Client;
   let esoStatusServer: EventEmitter;
   let subscriptionRepository: Repository<Subscription>;
@@ -89,11 +90,10 @@ describe('EsoStatusService (e2e)', (): void => {
     await dataSource.runMigrations();
     await runSeeders(dataSource);
 
-    app = await NestFactory.create(AppModule);
+    app = await NestFactory.createApplicationContext(AppModule);
     await app.init();
-    clientService = app.get(ClientService);
 
-    client = clientService.getClient();
+    client = app.get(Client);
     esoStatusServer = new EventEmitter();
     jest
       .spyOn(EsoStatusConnector, 'listen')
@@ -152,13 +152,7 @@ describe('EsoStatusService (e2e)', (): void => {
     await client.destroy();
   }, 15000);
 
-  it.each(<
-    {
-      event: EventType;
-      message?: Embed;
-      data?: EsoStatus | MaintenanceEsoStatus | EsoStatusSlug;
-    }[]
-  >[
+  it.each([
     {
       event: 'maintenancePlanned',
       message: {
@@ -305,7 +299,11 @@ describe('EsoStatusService (e2e)', (): void => {
         },
       },
     },
-  ])(
+  ] as {
+    event: EventType;
+    message?: Embed;
+    data?: EsoStatus | MaintenanceEsoStatus | EsoStatusSlug;
+  }[])(
     'should esoStatus connector event listen',
     async (event: {
       event: EventType;
@@ -326,7 +324,7 @@ describe('EsoStatusService (e2e)', (): void => {
             );
           }
 
-          client.on('ready', (): void => {
+          client.on(Events.ClientReady, (): void => {
             testEsoStatusEvent(
               client,
               app,
@@ -339,7 +337,6 @@ describe('EsoStatusService (e2e)', (): void => {
           });
         },
       );
-      expect(true).toBe(true);
     },
     15000,
   );

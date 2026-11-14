@@ -6,20 +6,20 @@ on:
       - "release/*"
 
 jobs:
-  cd:
+  ci:
     name: CD
     runs-on: ubuntu-latest
     timeout-minutes: 30
     if: github.event.base_ref != 'refs/heads/main'
     steps:
       - name: Récupération du code
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4.0.3
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 20.17.0
+          node-version: 26.13.1
 
       - name: Get version
         id: get_version
@@ -33,22 +33,12 @@ jobs:
           exist=`git tag -l ${{ steps.get_version.outputs.version }} | wc -l`
           echo "exist=$exist" >> $GITHUB_OUTPUT
 
-      - name: Install node dependencies
-        if: steps.tag_exist.outputs.exist == 0
-        run: |
-          npm ci --omit=dev
-
-      - name: Build assets
-        if: steps.tag_exist.outputs.exist == 0
-        run: npm run build
-
       - name: Set up QEMU
         if: steps.tag_exist.outputs.exist == 0
-        uses: docker/setup-qemu-action@v3.2.0
-
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # 4.4.0
       - name: Login to Harbor
         if: steps.tag_exist.outputs.exist == 0
-        uses: docker/login-action@v3.3.0
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # 4.8.0
         with:
           registry: ${{ secrets.HARBOR_URL }}
           username: ${{ secrets.HARBOR_USERNAME }}
@@ -56,11 +46,10 @@ jobs:
 
       - name: Set up Docker Buildx
         if: steps.tag_exist.outputs.exist == 0
-        uses: docker/setup-buildx-action@v3.6.1
-
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # 4.4.1
       - name: Build and push docker image
         if: steps.tag_exist.outputs.exist == 0
-        uses: docker/build-push-action@v6.7.0
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # 7.4.0
         with:
           context: .
           platforms: linux/amd64

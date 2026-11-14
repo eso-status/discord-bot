@@ -16,6 +16,12 @@ spec:
       labels:
         app: eso-status-bot-deploy
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - env:
         - name: DB_DEBUG
@@ -72,6 +78,12 @@ spec:
         image: eso_status_discord_bot
         imagePullPolicy: IfNotPresent
         name: eso-status-discord-bot
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
         resources:
           limits:
             memory: 4Gi

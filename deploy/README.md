@@ -2,7 +2,8 @@
 
 > Manifestes versionnés **par environnement** dans `prod/` (v2, branche `main`) et `preprod/` (v3,
 > branche `preprod`) : `namespace.yaml`, `deployment.yaml`, `cd-rbac.yaml` (le compte du CD) et
-> `kustomization.yaml`. Ils sont posés par **`init/03-env.sh <env>`**, puis tenus à jour par le CD.
+> `kustomization.yaml`. Ils sont posés par **`init/03-env.sh <env>`** ; le CD ne fait que changer
+> l'image du déploiement.
 >
 > Infra sous-jacente (cluster, Harbor, **MariaDB partagé**…) : le runbook de
 > [`dov118/infra`](https://github.com/dov118/infra), `server-setup.md`.
@@ -56,13 +57,14 @@ d'infra, « Sauvegardes des applications ».
 
 1. Un push sur `release/<version>` : `CD.yaml` construit l'image, la pousse dans
    `harbor.dov118.dev/desastreshow/eso_status_discord_bot:<version>` et pose le tag.
-2. La PR `release/<version>` (ouverte à la main) fusionnée dans `main` : `RELEASE.yaml` fixe
-   cette image dans `deploy/prod/` (`kustomize edit set image`), l'applique (`kubectl apply -k`),
-   attend le déploiement, puis crée la release GitHub.
+2. La PR `release/<version>` (ouverte à la main) fusionnée dans `main` : `RELEASE.yaml` passe
+   le déploiement sur cette image (`kubectl set image`), attend le déploiement, puis crée la
+   release GitHub.
 
-Il agit par le compte **`eso-status-bot-cd`** (`cd-rbac.yaml`), limité à son Deployment : il ne lit
-aucun secret et ne touche à rien d'autre sur le serveur. Le namespace et ce compte restent hors de
-la kustomization : c'est `03-env.sh` qui les pose.
+Il agit par le compte **`eso-status-bot-cd`** (`cd-rbac.yaml`), limité au changement d'image de son
+Deployment : il ne lit aucun secret et ne touche à rien d'autre sur le serveur. Tout le reste de
+`deploy/<env>/` (manifestes, réglages du déploiement, ce compte) est posé par `03-env.sh`, qui garde
+l'image en service : un changement de `deploy/` s'applique en le rejouant.
 
 Ses secrets GitHub : `KUBE_CONFIG` (le kubeconfig de ce compte, tiré par `init/cd-kubeconfig.sh`
 d'infra), `HARBOR_URL`, `HARBOR_PROJECT`, `HARBOR_REPOSITORY`, `HARBOR_USERNAME` (robot
