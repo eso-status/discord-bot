@@ -33,9 +33,7 @@ RUN apk upgrade --no-cache \
     && ln -snf /usr/share/zoneinfo/Europe/Paris /etc/localtime \
     && echo Europe/Paris > /etc/timezone \
     && addgroup -g 1000 node \
-    && adduser -u 1000 -G node -s /bin/sh -D node \
-    && mkdir /app \
-    && chown node:node /app
+    && adduser -u 1000 -G node -s /bin/sh -D node
 
 COPY --from=build /usr/local/bin/node /usr/local/bin/node
 
@@ -43,9 +41,9 @@ ENV TZ=Europe/Paris
 
 WORKDIR /app
 
-COPY --chown=node:node package.json start.sh ./
-COPY --chown=node:node --from=production-dependencies /app/node_modules ./node_modules
-COPY --chown=node:node --from=build /app/dist ./dist
+COPY package.json start.sh ./
+COPY --from=production-dependencies /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
 
 USER node
 
